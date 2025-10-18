@@ -1,2 +1,2 @@
-# laika-core
-Laika PHP Framework Core Model
+# lmvc_core
+Laika PHP Framework Core

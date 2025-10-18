@@ -1,0 +1,45 @@
+<?php
+/**
+ * Laika PHP MVC Framework
+ * Author: Showket Ahmed
+ * Email: riyadhtayf@gmail.com
+ * License: MIT
+ * This file is part of the Laika PHP MVC Framework.
+ * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
+ */
+
+declare(strict_types=1);
+
+// Namespace
+namespace CBM\App\Middleware{{NAMESPACE}};
+
+// Deny Direct Access
+defined('APP_PATH') || http_response_code(403).die('403 Direct Access Denied!');
+
+class {{NAME}}
+{
+    public function __construct(){}
+
+    /**
+     * @param \Closure $next. $next will bypass to controller if called
+     * @param ...$params Dynamic Parameters
+     */
+    public function handle(\Closure $next, array $params)
+    {
+        // Start Code From Here....
+
+
+        return $next($params);
+    }
+
+    public function terminate(string $response, array $params): string
+    {
+        // After controller
+        // Write Code From Here ......
+
+        
+
+        // You can modify the response if needed
+        return $response;
+    }
+}

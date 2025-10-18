@@ -1,0 +1,769 @@
+<?php
+
+/**
+ * Laika PHP MVC Framework
+ * Author: Showket Ahmed
+ * Email: riyadhtayf@gmail.com
+ * License: MIT
+ * This file is part of the Laika PHP MVC Framework.
+ * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
+ */
+
+declare(strict_types=1);
+
+namespace Laika\Core\App;
+
+defined('APP_PATH') || http_response_code(403) . die('403 Direct Access Denied!');
+
+use Laika\Core\Uri;
+use InvalidArgumentException;
+
+class Router
+{
+    private static array $routes = [];
+    private static array $globalBefore = [];
+    private static array $globalAfter = [];
+    private static array $middlewareGroups = [];
+    private static array $groupMiddlewares = [];
+    private static array $namedRoutes = [];
+    private static $fallback = null;
+    private static array $groupStack = [];
+    private static array $groupFallbacks = [];
+    private static ?string $lastMethod = null;
+    private static ?string $lastUri    = null;
+
+    ################################################################
+    /* ----------------------- PUBLIC API ----------------------- */
+    ################################################################
+
+    /**
+     * @param string $name Route Name. Example: 'home'
+     * @return self
+     */
+    public function name(string $name): self
+    {
+        if (self::$lastMethod && self::$lastUri) {
+            self::$routes[self::$lastMethod][self::$lastUri]['name'] = $name;
+            self::$namedRoutes[$name] = [self::$lastMethod, self::$lastUri];
+        }
+        return $this;
+    }
+
+    /**
+     * @param string $name Route Name. Example: 'home'
+     * @param array $params Parameters. Example: ['id'=>12,'action'=>'delete']
+     * @param bool $absolute Return Absolute Url. Default is false
+     * @return string
+     */
+    public static function url(string $name, array $params = [], bool $absolute = false): string
+    {
+        if (!isset(self::$namedRoutes[$name])) return '';
+
+        $uri = self::$namedRoutes[$name][1];
+
+        // Replace {param} placeholders
+        foreach ($params as $key => $value) {
+            $uri = preg_replace('/\{'.$key.'(:[^}]*)?\}/', (string) $value, $uri);
+        }
+
+        // Remove unreplaced params
+        $uri = preg_replace('/\{[^}]+\}/', '', $uri);
+
+        // Ensure leading slash
+        $uri = '/' . trim($uri, '/');
+
+        return $absolute ? Uri::base().trim($uri, '/') : $uri;
+    }
+
+    /**
+     * Register Get Route
+     * @param string $uri Route Uri
+     * @param callable|array|string $callback Example: HomeController@index or ['HomeController','index'] or Anonimous function
+     * @return self
+     */
+    public static function get(string $uri, callable|array|string $callback): self
+    {
+        $slug = self::groupedUri($uri);
+        self::$routes['GET'][$slug] = self::makeRoute($callback);
+        // track last registered route
+        self::$lastMethod = 'GET';
+        self::$lastUri    = $slug;
+        return new self;
+    }
+
+    /**
+     * Register Post Route
+     * @param string $uri Route Uri
+     * @param callable|array|string $callback Example: HomeController@index or ['HomeController','index'] or Anonimous function
+     * @return self
+     */
+    public static function post(string $uri, callable|array|string $callback): self
+    {
+        $slug = self::groupedUri($uri);
+        self::$routes['POST'][$slug] = self::makeRoute($callback);
+        // track last registered route
+        self::$lastMethod = 'POST';
+        self::$lastUri    = $slug;
+        return new self;
+    }
+
+    /**
+     * Register Put Route
+     * @param string $uri Route Uri
+     * @param callable|array|string $callback Example: HomeController@index or ['HomeController','index'] or Anonimous function
+     * @return self
+     */
+    public static function put(string $uri, callable|array|string $callback): self
+    {
+        $slug = self::groupedUri($uri);
+        self::$routes['PUT'][$slug] = self::makeRoute($callback);
+        // track last registered route
+        self::$lastMethod = 'PUT';
+        self::$lastUri    = $slug;
+        return new self;
+    }
+
+    /**
+     * Register Patch Route
+     * @param string $uri Route Uri
+     * @param callable|array|string $callback Example: HomeController@index or ['HomeController','index'] or Anonimous function
+     * @return self
+     */
+    public static function patch(string $uri, callable|array|string $callback): self
+    {
+        $slug = self::groupedUri($uri);
+        self::$routes['PATCH'][$slug] = self::makeRoute($callback);
+        // track last registered route
+        self::$lastMethod = 'PATCH';
+        self::$lastUri    = $slug;
+        return new self;
+    }
+
+    /**
+     * Register Delete Route
+     * @param string $uri Route Uri
+     * @param callable|array|string $callback Example: HomeController@index or ['HomeController','index'] or Anonimous function
+     * @return self
+     */
+    public static function delete(string $uri, callable|array|string $callback): self
+    {
+        $slug = self::groupedUri($uri);
+        self::$routes['DELETE'][$slug] = self::makeRoute($callback);
+        // track last registered route
+        self::$lastMethod = 'DELETE';
+        self::$lastUri    = $slug;
+        return new self;
+    }
+
+    /**
+     * Register Options Route
+     * @param string $uri Route Uri
+     * @param callable|array|string $callback Example: HomeController@index or ['HomeController','index'] or Anonimous function
+     * @return self
+     */
+    public static function options(string $uri, callable|array|string $callback): self
+    {
+        $slug = self::groupedUri($uri);
+        self::$routes['OPTIONS'][$slug] = self::makeRoute($callback);
+        // track last registered route
+        self::$lastMethod = 'OPTIONS';
+        self::$lastUri    = $slug;
+        return new self;
+    }
+
+    /**
+     * Register Head Route
+     * @param string $uri Route Uri
+     * @param callable|array|string $callback Example: HomeController@index or ['HomeController','index'] or Anonimous function
+     * @return self
+     */
+    public static function head(string $uri, callable|array|string $callback): self
+    {
+        $slug = self::groupedUri($uri);
+        self::$routes['HEAD'][$slug] = self::makeRoute($callback);
+        // track last registered route
+        self::$lastMethod = 'HEAD';
+        self::$lastUri    = $slug;
+        return new self;
+    }
+
+    /**
+     * Register Group Http
+     * @param string $prefix Route Prefix. Example: 'admin'
+     * @param callable $callback Callback With Http Groups.
+     * @param array $middlewares Array of Middlewares. Example: ['InitiateDB', 'Auth']
+     * @return self
+     */
+    public static function group(string $prefix, callable $callback, array $middlewares = []): self
+    {
+        // push normalized prefix fragment onto stack (ensures leading slash, no trailing)
+        self::$groupStack[] = self::normalize($prefix);
+
+        // Get previous middlewares
+        $previousMiddlewares = self::$groupMiddlewares;
+
+        // merge group middlewares
+        self::$groupMiddlewares = array_merge(
+            self::$groupMiddlewares,
+            self::expandGroups($middlewares)
+        );
+
+        // call user callback (allows Http::get() calls inside)
+        $callback(new self);
+
+        // Pop prefix & restore middlewares
+        array_pop(self::$groupStack);
+        self::$groupMiddlewares = $previousMiddlewares;
+
+        return new self;
+    }
+
+    /**
+     * Middleware Group
+     * @param string $name Midleware Group Name. Example: Http::middlewareGroup('web', ['InitiateDB','Auth'])
+     * @param array $middlewares Array of Middlewares. Http::middlewareGroup('web', ['InitiateDB','Auth'])
+     * @return self
+     */
+    public static function middlewareGroup(string $name, array $middlewares): self
+    {
+        self::$middlewareGroups[$name] = $middlewares;
+        return new self;
+    }
+
+    /**
+     * Middleware
+     * @param array|string $middlewares Midleware Name. Example: Http::middleware(['InitiateDB']) or Http::middleware('InitiateDB'])
+     * @return self
+     */
+    public function middleware(array|string $middlewares): self
+    {
+        if (!is_array($middlewares)) $middlewares = [$middlewares];
+        if (self::$lastMethod && self::$lastUri) {
+            self::$routes[self::$lastMethod][self::$lastUri]['middlewares'] =
+                array_merge(self::$routes[self::$lastMethod][self::$lastUri]['middlewares'], $middlewares);
+        }
+        return $this;
+    }
+
+    /**
+     * After Middleware
+     * @param array|string $middlewares Midleware Name. Example: Http::middleware(['InitiateDB']) or Http::middleware('InitiateDB'])
+     * @return self
+     */
+    public function afterware(array|string $middlewares): self
+    {
+        if (!is_array($middlewares)) $middlewares = [$middlewares];
+        if (self::$lastMethod && self::$lastUri) {
+            self::$routes[self::$lastMethod][self::$lastUri]['afterwares'] =
+                array_merge(self::$routes[self::$lastMethod][self::$lastUri]['afterwares'], $middlewares);
+        }
+        return $this;
+    }
+
+    /**
+     * Global Middleware
+     * @param array|string $middlewares Midleware Name. Example: Http::middleware(['InitiateDB']) or Http::middleware('InitiateDB'])
+     * @param int $priority Middleware Priority. Default is 50
+     * @return self
+     */
+    public static function globalMiddleware(array|string $middlewares, int $priority = 50): self
+    {
+        foreach ((array)$middlewares as $mw) {
+            foreach (self::expandGroups([$mw]) as $expanded) {
+                self::$globalBefore[] = ['name' => $expanded, 'priority' => $priority];
+            }
+        }
+        return new self;
+    }
+
+    /**
+     * Global After Middleware
+     * @param array|string $middlewares Midleware Name. Example: Http::middleware(['InitiateDB']) or Http::middleware('InitiateDB'])
+     * @param int $priority Middleware Priority. Default is 50
+     * @return self
+     */
+    public static function globalAfter(array|string $middlewares, int $priority = 50): self
+    {
+        foreach ((array)$middlewares as $mw) {
+            foreach (self::expandGroups([$mw]) as $expanded) {
+                self::$globalAfter[] = ['name' => $expanded, 'priority' => $priority];
+            }
+        }
+        return new self;
+    }
+
+    /**
+     * Register Fallback Route for 404
+     * @param callable|array|string $callback
+     * @return self
+     */
+    public static function fallback(callable|array|string $callback): self
+    {
+        self::$fallback = $callback;
+        return new self;
+    }
+
+    /**
+     * Define fallback for current group
+     * @param callable|array|string $callback
+     * @return self
+     */
+    public static function groupFallback(callable|array|string $callback): self
+    {
+        if (!empty(self::$groupStack)) {
+            $prefix = implode('', self::$groupStack);
+            self::$groupFallbacks[$prefix] = $callback;
+        }
+        return new self;
+    }
+
+    ########################################################
+    /* ------------------- DISPATCHER ------------------- */
+    ########################################################
+
+    public static function dispatch(): void
+    {
+        $method = strtoupper($_SERVER['REQUEST_METHOD'] ?? 'GET');
+        $path = self::normalize('/' . Uri::path());
+
+        // Fallback If Http Method Doesn't Exists
+        if (!isset(self::$routes[$method])) goto fallback;
+
+        foreach (self::$routes[$method] as $route => $data) {
+            $pattern = preg_replace_callback(
+                '/\{([a-zA-Z_][a-zA-Z0-9_]*)(:([^}]+))?\}/',
+                function ($params) {
+                    $name = $params[1];
+                    $regex = !empty($params[3]) ? $params[3] : '[a-zA-Z0-9-_]+';
+                    return '(?P<' . $name . '>' . $regex . ')';
+                },
+                $route
+            );
+            $pattern = "#^{$pattern}$#";
+
+            if (preg_match($pattern, $path, $matches)) {
+                array_shift($matches);
+                $matches = array_filter($matches, 'is_string', ARRAY_FILTER_USE_KEY);
+
+                // Sort global before/after
+                usort(self::$globalBefore, fn($a, $b) => $a['priority'] <=> $b['priority']);
+                usort(self::$globalAfter, fn($a, $b) => $a['priority'] <=> $b['priority']);
+                $before = array_column(self::$globalBefore, 'name');
+                $after  = array_column(self::$globalAfter, 'name');
+
+                // Merge before middlewares
+                $middlewares = array_merge($before, $data['middlewares']);
+                $callback = $data['callback'];
+
+                // Run pipeline
+                ob_start();
+
+                $runner = function ($index, array $context = []) use (&$runner, $middlewares, $callback, $matches) {
+                    if (isset($middlewares[$index])) {
+                        [$name, $params] = self::parseMiddleware($middlewares[$index], $matches);
+                        $middlewareClass = "CBM\\App\\Middleware\\{$name}";
+
+                        if (!class_exists($middlewareClass)) {
+                            throw new InvalidArgumentException("Invalid Middleware Detected: {$middlewareClass}");
+                        }
+
+                        $instance = new $middlewareClass();
+
+                        if (method_exists($instance, 'handle')) {
+                            // next closure — when called, it advances the pipeline and merges context
+                            $next = function(array $nextContext = []) use (&$runner, $index, $context) {
+                                return $runner($index + 1, array_merge($context, $nextContext));
+                            };
+
+                            // Prepare reflection
+                            $ref = new \ReflectionMethod($instance, 'handle');
+                            $merged = array_merge($context, $params); // merged named route params + middleware-returned context
+
+                            // Build args for invokeArgs:
+                            // - always pass $next as first param
+                            // - if middleware is variadic, spread merged values as subsequent positional args
+                            // - elseif middleware expects a second parameter, pass merged array as second arg
+                            $args = [$next];
+                            $paramCount = count($ref->getParameters());
+
+                            if ($ref->isVariadic()) {
+                                $args = array_merge($args, $merged);
+                            } elseif ($paramCount > 1) {
+                                // middleware expects at least two params (e.g. handle(Closure $next, array $context))
+                                $args[] = $merged;
+                            }
+
+                            // Invoke
+                            $result = $ref->invokeArgs($instance, $args);
+
+                            // Normalize result: accept either [$response, $newContext] or single response or null
+                            $response = null;
+                            $newContext = [];
+                            if (is_array($result) && array_key_exists(0, $result)) {
+                                $response = $result[0] ?? null;
+                                $newContext = $result[1] ?? [];
+                            } else {
+                                $response = $result;
+                            }
+
+                            return [$response, array_merge($context, (array)$newContext)];
+                        }
+
+                        // No handle() → continue
+                        return $runner($index + 1, $context);
+                    }
+
+                    // FINAL STEP: merge route params + middleware-returned context
+                    $finalParams = array_merge($matches, $context);
+
+                    $response = self::executeCallback($callback, $finalParams);
+                    return [$response, $finalParams];
+                };
+                [$result, $finalParams] = $runner(0);
+
+                // Combine echoed output + returned string (if any)
+                $buffer = ob_get_clean();
+                $response = ($buffer !== '' ? $buffer : '') . ($result ?? '');
+
+                // Run AFTER middlewares (route + global)
+                $afterwares = array_merge($data['afterwares'], $after);
+
+                foreach ($afterwares as $mw) {
+                    [$name, $params] = self::parseMiddleware($mw, $matches);
+                    $middlewareClass = "CBM\\App\\Middleware\\{$name}";
+
+                    if (class_exists($middlewareClass)) {
+                        $instance = new $middlewareClass();
+
+                        if (method_exists($instance, 'terminate')) {
+                            $ref = new \ReflectionMethod($instance, 'terminate');
+                            $args = [$response];
+
+                            $paramCount = count($ref->getParameters());
+
+                            if ($ref->isVariadic()) {
+                                $args = array_merge($args, $params);
+                            } elseif ($paramCount > 1) {
+                                // Afterware expects at least two params (e.g. terminate($response, array $params))
+                                $args[] = $params;
+                            }
+
+                            $response = $ref->invokeArgs($instance, $args);
+                        }
+                    }
+                }
+
+                echo $response;
+                return;
+            }
+        }
+
+        // Fallback Marker
+        fallback:
+        // Try group-specific fallbacks
+        foreach (array_reverse(self::$groupFallbacks) as $prefix => $callback) {
+            if (str_starts_with($path, $prefix)) {
+                self::executeCallback($callback, []);
+                return;
+            }
+        }
+
+        // Try global fallback
+        if (self::$fallback) {
+            self::executeCallback(self::$fallback, []);
+            return;
+        }
+
+        http_response_code(404);
+        require_once __DIR__.'/404.php';
+    }
+
+    #######################################################
+    /* ------------------- INSPECTOR ------------------- */
+    #######################################################
+
+    /**
+     * Inspect middleware pipeline for a given method + uri
+     * @param string $method Method Name: Example: 'get'
+     * @param string $uri Route: Example: '/dashboard'
+     */
+    public static function inspect(string $method, string $uri): void
+    {
+        $method = strtoupper($method);
+        $path = self::normalize($uri);
+
+        $isCli = (php_sapi_name() === 'cli');
+
+        if (!isset(self::$routes[$method])) {
+            echo $isCli
+                ? "No Routes Registered for {$method}\n"
+                : "No Routes Registered for {$method}<br>";
+            return;
+        }
+
+        foreach (self::$routes[$method] as $route => $data) {
+            // Allow {param} and {param:regex}
+            $pattern = preg_replace_callback(
+                '/\{([a-zA-Z_][a-zA-Z0-9_]*)(:([^}]+))?\}/',
+                function ($params) {
+                    $name = $params[1];
+                    $regex = !empty($params[3]) ? $params[3] : '[a-zA-Z0-9-_]+';
+                    return '(?P<' . $name . '>' . $regex . ')';
+                },
+                $route
+            );
+            $pattern = "#^{$pattern}$#";
+
+            if (preg_match($pattern, $path)) {
+                // Sort global middleware
+                usort(self::$globalBefore, fn($a, $b) => $a['priority'] <=> $b['priority']);
+                usort(self::$globalAfter, fn($a, $b) => $a['priority'] <=> $b['priority']);
+
+                $before = array_column(self::$globalBefore, 'name');
+                $after  = array_column(self::$globalAfter, 'name');
+
+                $routeBefore = self::expandGroups($data['middlewares']);
+                $routeAfter  = self::expandGroups($data['afterwares']);
+
+                // Build execution order
+                $pipeline = array_merge($before, $routeBefore, ['[Controller]'], $routeAfter, $after);
+
+                // Header
+                echo $isCli
+                    ? "=== Middleware Pipeline for [{$method} {$uri}] ===\n"
+                    : "=== Middleware Pipeline for [{$method} {$uri}] ===<br>";
+
+                // Steps
+                foreach ($pipeline as $i => $step) {
+                    $num = $i + 1;
+                    echo $isCli
+                        ? "{$num}. {$step}\n"
+                        : "{$num}. {$step}<br>";
+                }
+                return;
+            }
+        }
+        echo $isCli
+            ? "No Route Matches {$method} {$uri}\n"
+            : "No Route Matches {$method} {$uri}<br>";
+        return;
+    }
+
+    public static function inspectAll(): void
+    {
+        $isCli = (php_sapi_name() === 'cli');
+
+        if (empty(self::$routes)) {
+            echo $isCli
+                ? "No routes registered.\n"
+                : "<p>No routes registered.</p>";
+            return;
+        }
+
+        if ($isCli) {
+            // CLI MODE → print console table
+            echo str_repeat("=", 160) . "\n";
+            echo sprintf("%-8s %-30s %-20s %-50s %-30s\n", "METHOD", "ROUTE", "NAME", "CALLBACK", "PIPELINE");
+            echo str_repeat("-", 160) . "\n";
+
+            foreach (self::$routes as $method => $routes) {
+                foreach ($routes as $uri => $data) {
+                    $callback = is_array($data['callback'])
+                        ? implode('@', $data['callback'])
+                        : (is_string($data['callback']) ? $data['callback'] : 'Closure');
+
+                    $name = $data['name'] ?: '.';
+                    $pipeline = implode(' -> ', self::buildPipeline($data));
+                    echo sprintf("%-8s %-30s %-20s %-50s %-30s\n", $method, $uri, $name, $callback, $pipeline);
+                }
+            }
+            echo str_repeat("=", 100) . "\n";
+        } else {
+            // Browser output: HTML table
+            echo '<style>
+                table.routes { width:100%; border-collapse: collapse; margin:20px 0; font-family:monospace; }
+                table.routes th, table.routes td { border:1px solid #ccc; padding:6px 10px; text-align:left; }
+                table.routes th { background:#f8f8f8; }
+                table.routes tr:nth-child(even) { background:#fafafa; }
+                .method { font-weight:bold; color:#0366d6; }
+                .pipeline { color:#555; font-size:0.9em; }
+            </style>';
+
+            echo "<table class='routes'>
+                <thead>
+                    <tr>
+                        <th>Method</th>
+                        <th>Route</th>
+                        <th>Name</th>
+                        <th>Callback</th>
+                        <th>Pipeline</th>
+                    </tr>
+                </thead>
+                <tbody>";
+
+            foreach (self::$routes as $method => $routes) {
+                foreach ($routes as $route => $data) {
+                    $callbackInfo = self::callbackToString($data['callback']);
+                    $pipeline = self::buildPipeline($data);
+                    $name = $data['name'] ?? '-';
+
+                    echo "<tr>
+                        <td class='method'>{$method}</td>
+                        <td>{$route}</td>
+                        <td>{$name}</td>
+                        <td>{$callbackInfo}</td>
+                        <td class='pipeline'>" . implode(" → ", $pipeline) . "</td>
+                    </tr>";
+                }
+            }
+
+            echo "</tbody></table>";
+        }
+    }
+
+    ######################################################
+    /* ----------------- INTERNAL API ----------------- */
+    ######################################################
+
+    /**
+     * Execute Callback
+     * @param callable|array|string $callback Example: HomeController@index or ['HomeController','index'] or Anonimous function 
+     * @param array ...$params Parameters from Slug & Middlewares
+     */
+    protected static function executeCallback(callable|string $callback, array $params)
+    {
+        // Controller string syntax: 'Controller@method'
+        if (is_string($callback) && str_contains($callback, '@')) {
+            [$controller, $method] = explode('@', $callback);
+            $controller = "CBM\\App\\Controller\\{$controller}";
+
+            if (!class_exists($controller) || !method_exists($controller, $method)) {
+                throw new InvalidArgumentException("Controller or method not found: {$controller}@{$method}");
+            }
+
+            $ref = new \ReflectionMethod($controller, $method);
+            $args = self::mapParamsToReflection($ref, $params);
+
+            return $ref->invokeArgs(new $controller(), $args);
+        }
+
+        // Closure or callable array
+        $ref = new \ReflectionFunction($callback);
+        $args = self::mapParamsToReflection($ref, $params);
+
+        return $ref->invokeArgs($args);
+    }
+
+    protected static function mapParamsToReflection(\ReflectionFunctionAbstract $ref, array $params): array
+    {
+        $args = [];
+        $paramNames = array_keys($params);
+
+        foreach ($ref->getParameters() as $param) {
+            $name = $param->getName();
+
+            if (array_key_exists($name, $params)) {
+                $args[] = $params[$name];
+            } elseif ($param->isDefaultValueAvailable()) {
+                $args[] = $param->getDefaultValue();
+            } elseif ($param->isVariadic()) {
+                // Spread the rest
+                $args = array_merge($args, $params);
+                break;
+            } else {
+                // Fallback null for missing
+                $args[] = null;
+            }
+        }
+
+        return $args;
+    }
+
+    private static function expandGroups(array $middlewares): array
+    {
+        $expanded = [];
+        foreach ($middlewares as $mw) {
+            if (isset(self::$middlewareGroups[$mw])) {
+                $expanded = array_merge($expanded, self::$middlewareGroups[$mw]);
+            } else {
+                $expanded[] = $mw;
+            }
+        }
+        return $expanded;
+    }
+
+    private static function parseMiddleware(string $middleware, array $matches): array
+    {
+        // $matches is Associative named params (['id' => 3])
+        $parts = explode('|', $middleware, 2);
+        $name = $parts[0];
+
+        $extra = isset($parts[1]) ? explode(',', $parts[1]) : [];
+        foreach($extra as $param){
+            $internal_params = explode(':', $param);
+            $matches[$internal_params[0]] = $internal_params[1] ?? null;
+        }
+        // return [$name, array_merge($routeParams, ['action'=>$extra])];
+        return [$name, $matches];
+    }
+
+    private static function normalize(string $uri): string
+    {
+        $slug = '/' . trim($uri, '/');
+        return $slug === '' ? '/' : $slug;
+    }
+
+    private static function groupedUri(string $uri): string
+    {
+        // join normalized stack fragments (each fragment starts with '/')
+        $prefix = implode('', self::$groupStack); // e.g. '/admin/shop'
+        $full   = rtrim($prefix, '/') . '/' . ltrim($uri, '/');
+
+        return self::normalize($full);
+    }
+
+    private static function groupedMiddlewares(): array
+    {
+        return self::$groupMiddlewares;
+    }
+    private static function callbackToString($callback): string
+    {
+        if (is_string($callback)) {
+            return $callback;
+        } elseif (is_array($callback)) {
+            return "{$callback[0]}@{$callback[1]}";
+        } elseif ($callback instanceof \Closure) {
+            return 'Closure';
+        }
+        return 'Unknown';
+    }
+
+    private static function buildPipeline(array $data): array
+    {
+        // Sort global middleware
+        usort(self::$globalBefore, fn($a, $b) => $a['priority'] <=> $b['priority']);
+        usort(self::$globalAfter, fn($a, $b) => $a['priority'] <=> $b['priority']);
+
+        $before = array_column(self::$globalBefore, 'name');
+        $after  = array_column(self::$globalAfter, 'name');
+
+        $routeBefore = self::expandGroups($data['middlewares']);
+        $routeAfter  = self::expandGroups($data['afterwares']);
+
+        return array_merge($before, $routeBefore, ['[Controller]'], $routeAfter, $after);
+    }
+
+    /**
+     * Make Route
+     * @param callable|array|string $callback Example: HomeController@index or ['HomeController','index'] or Anonimous function
+     */
+    private static function makeRoute(callable|array|string $callback)
+    {
+        return [
+            'callback'      =>  $callback,
+            'middlewares'   =>  self::groupedMiddlewares(),
+            'afterwares'    =>  [],
+            'name'          =>  null
+        ];
+    }
+}

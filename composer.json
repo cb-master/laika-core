@@ -1,0 +1,44 @@
+{
+    "name": "cb-master/laika-core",
+    "description": "Laika PHP Framework Core",
+    "type": "package",
+    "license": "MIT",
+    "autoload": {
+        "files": [
+            "helpers/functions.php",
+            "helpers/filters.php"
+        ],
+        "psr-4": {
+            "Laika\\Core\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Cloud Bill Master",
+            "email": "strblackhawk@gmail.com"
+        },
+        {
+            "name":"Showket Ahmed",
+            "email":"riyadhtayf@gmail.com"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {
+        "php": ">=8.1",
+        "cb-master/laika-model": "^1",
+        "cb-master/laika-session": "^1",
+        "cb-master/laika-template-engine": "^1",
+        "firebase/php-jwt": "^6",
+        "aws/aws-sdk-php": "^3.275"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^10.0"
+    },
+    "prefer-stable": true,
+    "scripts": {
+        "test": [
+            "@php vendor/bin/phpunit --configuration phpunit.xml.dist --colors=always --testdox || true"
+        ],
+        "lint": "php-cs-fixer fix --dry-run --diff"
+    }
+}
