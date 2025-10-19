@@ -356,8 +356,8 @@ class Router
                 $matches = array_filter($matches, 'is_string', ARRAY_FILTER_USE_KEY);
 
                 // Sort global before/after
-                usort(self::$globalBefore, fn($a, $b) => $a['priority'] <=> $b['priority']);
-                usort(self::$globalAfter, fn($a, $b) => $a['priority'] <=> $b['priority']);
+                usort(self::$globalBefore, fn ($a, $b) => $a['priority'] <=> $b['priority']);
+                usort(self::$globalAfter, fn ($a, $b) => $a['priority'] <=> $b['priority']);
                 $before = array_column(self::$globalBefore, 'name');
                 $after  = array_column(self::$globalAfter, 'name');
 
@@ -526,8 +526,8 @@ class Router
 
             if (preg_match($pattern, $path)) {
                 // Sort global middleware
-                usort(self::$globalBefore, fn($a, $b) => $a['priority'] <=> $b['priority']);
-                usort(self::$globalAfter, fn($a, $b) => $a['priority'] <=> $b['priority']);
+                usort(self::$globalBefore, fn ($a, $b) => $a['priority'] <=> $b['priority']);
+                usort(self::$globalAfter, fn ($a, $b) => $a['priority'] <=> $b['priority']);
 
                 $before = array_column(self::$globalBefore, 'name');
                 $after  = array_column(self::$globalAfter, 'name');
@@ -751,8 +751,8 @@ class Router
     private static function buildPipeline(array $data): array
     {
         // Sort global middleware
-        usort(self::$globalBefore, fn($a, $b) => $a['priority'] <=> $b['priority']);
-        usort(self::$globalAfter, fn($a, $b) => $a['priority'] <=> $b['priority']);
+        usort(self::$globalBefore, fn ($a, $b) => $a['priority'] <=> $b['priority']);
+        usort(self::$globalAfter, fn ($a, $b) => $a['priority'] <=> $b['priority']);
 
         $before = array_column(self::$globalBefore, 'name');
         $after  = array_column(self::$globalAfter, 'name');
