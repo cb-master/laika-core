@@ -32,7 +32,7 @@ jobs:
 
       - name: Get Composer cache directory
         id: composer-cache
-        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+        run: echo "dir=$(composer config cache-files-dir || echo ~/.composer/cache)" >> $GITHUB_OUTPUT
 
       - name: Cache Composer dependencies
         uses: actions/cache@v4
@@ -74,7 +74,7 @@ jobs:
 
       - name: Get Composer cache directory
         id: composer-cache
-        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+        run: echo "dir=$(composer config cache-files-dir || echo ~/.composer/cache)" >> $GITHUB_OUTPUT
 
       - name: Cache Composer dependencies
         uses: actions/cache@v4
@@ -117,7 +117,7 @@ jobs:
 
       - name: Get Composer cache directory
         id: composer-cache
-        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+        run: echo "dir=$(composer config cache-files-dir || echo ~/.composer/cache)" >> $GITHUB_OUTPUT
 
       - name: Cache Composer dependencies
         uses: actions/cache@v4
@@ -169,15 +169,16 @@ jobs:
           path: |
             ${{ env.ARTIFACT }}.zip
             ${{ env.ARTIFACT }}.zip.sha256
+          retention-days: 30
 
       # Create GitHub Release
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ github.ref_name }}
-          name: "Laika Core - ${{ env.CHANNEL | toUpperCase }}"
+          name: "Laika Core - ${{ env.CHANNEL == 'beta' && 'BETA' || 'STABLE' }}"
           body: |
-            🚀 **Laika Framework Core ${{ env.CHANNEL | toUpperCase() }} Release**
+            🚀 **Laika Framework Core ${{ env.CHANNEL == 'beta' && 'BETA' || 'STABLE' }} Release**
 
             **Tag:** ${{ github.ref_name }}
             **Commit:** ${{ github.sha }}
