@@ -19,7 +19,7 @@ defined('APP_PATH') || http_response_code(403) . die('403 Direct Access Denied!'
 use Laika\Core\Console\Command;
 
 // Remove Middleware Class
-class Pop Extends Command
+class Pop extends Command
 {
     // App Middleware Path
     protected string $path = APP_PATH . '/lf-app/Middleware';
@@ -51,7 +51,7 @@ class Pop Extends Command
 
         $file = "{$this->path}/{$parts['name']}.php";
 
-         // Check Middleware Path is Valid
+        // Check Middleware Path is Valid
         if (!is_file($file)) {
             $this->error("Invalid Middleware or Path: '{$params[0]}'");
             return;

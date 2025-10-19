@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace Laika\Core;
 
 // Deny Direct Access
-defined('APP_PATH') || http_response_code(403).die('403 Direct Access Denied!');
+defined('APP_PATH') || http_response_code(403) . die('403 Direct Access Denied!');
 
 class ClientInfo
 {
@@ -158,10 +158,26 @@ class ClientInfo
         $ua = strtolower($this->userAgent);
 
         $bots = [
-            'googlebot', 'bingbot', 'slurp', 'duckduckbot', 'baiduspider', 'yandexbot',
-            'sogou', 'exabot', 'facebot', 'ia_archiver', 'mj12bot', 'semrushbot',
-            'ahrefsbot', 'dotbot', 'uptimebot', 'twitterbot', 'petalbot',
-            'crawler', 'spider', 'bot'
+            'googlebot',
+            'bingbot',
+            'slurp',
+            'duckduckbot',
+            'baiduspider',
+            'yandexbot',
+            'sogou',
+            'exabot',
+            'facebot',
+            'ia_archiver',
+            'mj12bot',
+            'semrushbot',
+            'ahrefsbot',
+            'dotbot',
+            'uptimebot',
+            'twitterbot',
+            'petalbot',
+            'crawler',
+            'spider',
+            'bot'
         ];
 
         foreach ($bots as $bot) {
@@ -195,19 +211,21 @@ class ClientInfo
      */
     protected function detectIp(): ?string
     {
-        foreach ([
-            'HTTP_CLIENT_IP',
-            'HTTP_X_FORWARDED_FOR',
-            'HTTP_X_FORWARDED',
-            'HTTP_FORWARDED_FOR',
-            'HTTP_FORWARDED',
-            'REMOTE_ADDR'
-        ] as $key) {
+        foreach (
+            [
+                'HTTP_CLIENT_IP',
+                'HTTP_X_FORWARDED_FOR',
+                'HTTP_X_FORWARDED',
+                'HTTP_FORWARDED_FOR',
+                'HTTP_FORWARDED',
+                'REMOTE_ADDR'
+            ] as $key
+        ) {
             if (!empty($_SERVER[$key])) {
                 $ips = explode(',', $_SERVER[$key]);
-                foreach($ips as $ip){
+                foreach ($ips as $ip) {
                     $ip = trim($ip);
-                    if(filter_var($ip, FILTER_VALIDATE_IP, [FILTER_FLAG_IPV4, FILTER_FLAG_IPV6])) return $ip;
+                    if (filter_var($ip, FILTER_VALIDATE_IP, [FILTER_FLAG_IPV4, FILTER_FLAG_IPV6])) return $ip;
                 }
             }
         }

@@ -15,7 +15,7 @@ declare(strict_types=1);
 namespace Laika\Core;
 
 // Deny Direct Access
-defined('APP_PATH') || http_response_code(403).die('403 Direct Access Denied!');
+defined('APP_PATH') || http_response_code(403) . die('403 Direct Access Denied!');
 
 use Laika\Core\Http\Response;
 use ErrorException;
@@ -109,7 +109,11 @@ class ErrorHandler
         $error = error_get_last();
         if ($error && in_array($error['type'], [E_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR])) {
             self::$exceptions[] = new ErrorException(
-                $error['message'], 0, $error['type'], $error['file'], $error['line']
+                $error['message'],
+                0,
+                $error['type'],
+                $error['file'],
+                $error['line']
             );
         }
 

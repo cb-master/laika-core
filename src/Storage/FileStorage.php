@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace Laika\Core\Storage;
 
 // Deny Direct Access
-defined('APP_PATH') || http_response_code(403).die('403 Direct Access Denied!');
+defined('APP_PATH') || http_response_code(403) . die('403 Direct Access Denied!');
 
 use Aws\Exception\AwsException;
 use Laika\Core\{Directory, Uri};
@@ -77,14 +77,14 @@ class FileStorage
     {
         // Check Disk is Supported
         $disk = strtolower($disk);
-        if(!in_array($disk, ['local','s3'])) {
+        if (!in_array($disk, ['local', 's3'])) {
             throw new RuntimeException("Unsupported Disk '{$disk}'. Accepted Disk Types Are: 'local', 's3'");
         }
 
         $this->disk = $disk;
         $this->config = $config;
         $this->publicBaseUrl = $publicBaseUrl ? rtrim($publicBaseUrl, '/') . '/' : $publicBaseUrl;
-        
+
         if ($this->disk === 's3') {
             $this->path = 'lf-storage';
             // Check Config Required Keys are Exists
@@ -106,7 +106,7 @@ class FileStorage
                 'version'       =>  'latest',
                 'credentials'   =>  [
                     'key'   =>  $config['key'],
-                    'secret'=>  $config['secret']
+                    'secret' =>  $config['secret']
                 ]
             ]);
         } else {
@@ -149,7 +149,7 @@ class FileStorage
         $ext = pathinfo($this->name, PATHINFO_EXTENSION);
         $base = pathinfo($this->name, PATHINFO_FILENAME);
         $this->name = $base . '-' . uniqid() . '-' . time() . ($ext ? ".{$ext}" : '');
-        
+
         // Final target path
         $this->path = "{$this->path}/{$this->name}";
 
@@ -201,7 +201,7 @@ class FileStorage
      */
     public function mime()
     {
-        if(!isset($this->mime)) {
+        if (!isset($this->mime)) {
             throw new Exception("Please Upload The  File First!");
         }
 
@@ -221,11 +221,11 @@ class FileStorage
     {
         $file = ltrim($file, '/');
         $uri = new Uri();
-        return match ($this->disk){
-            'local' => str_replace(ltrim(APP_PATH, '/'), '', ltrim(option('app.host', rtrim($uri->base(), '/'))."{$file}", '/')),
+        return match ($this->disk) {
+            'local' => str_replace(ltrim(APP_PATH, '/'), '', ltrim(option('app.host', rtrim($uri->base(), '/')) . "{$file}", '/')),
             's3'    => $this->publicBaseUrl
-                        ? $this->publicBaseUrl.$file
-                        : sprintf("https://%s.s3.%s.amazonaws.com/%s", $this->config['bucket'], $this->config['region'],$file),
+                ? $this->publicBaseUrl . $file
+                : sprintf("https://%s.s3.%s.amazonaws.com/%s", $this->config['bucket'], $this->config['region'], $file),
             default => ''
         };
     }

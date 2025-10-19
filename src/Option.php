@@ -15,7 +15,7 @@ declare(strict_types=1);
 namespace Laika\Core;
 
 // Deny Direct Access
-defined('APP_PATH') || http_response_code(403).die('403 Direct Access Denied!');
+defined('APP_PATH') || http_response_code(403) . die('403 Direct Access Denied!');
 
 use Laika\Model\DB;
 
@@ -62,9 +62,9 @@ class Option
         $exist = $db->table(self::$table)->where(self::$key, '=', $name)->first();
 
         if (empty($exist)) {
-            return (bool) $db->table(self::$table)->insert([self::$key => $name, self::$value => $value, 'opt_default'=>$opt_default]);
+            return (bool) $db->table(self::$table)->insert([self::$key => $name, self::$value => $value, 'opt_default' => $opt_default]);
         }
 
-        return (bool) $db->table(self::$table)->where(self::$key, '=', $name)->update([self::$value=>$value]);
+        return (bool) $db->table(self::$table)->where(self::$key, '=', $name)->update([self::$value => $value]);
     }
 }

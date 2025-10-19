@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Laika PHP MVC Framework
  * Author: Showket Ahmed
@@ -10,15 +11,14 @@
 
 declare(strict_types=1);
 
-// Namespace
-namespace CBM\App\Model{{NAMESPACE}};
+namespace Laika\App\Model{{NAMESPACE}};
 
 // Deny Direct Access
 defined('APP_PATH') || http_response_code(403).die('403 Direct Access Denied!');
 
-use CBM\Core\App\Model;
+use Laika\Core\App\Model;
 
-class {{NAME}} Extends Model
+class {{NAME}} extends Model
 {
     // Table Name
     public string $table = '{{TABLE_NAME}}';

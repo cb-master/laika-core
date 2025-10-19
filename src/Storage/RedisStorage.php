@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Laika PHP MVC Framework
  * Author: Showket Ahmed
@@ -13,7 +14,7 @@ declare(strict_types=1);
 namespace Laika\Core\Storage;
 
 // Deny Direct Access
-defined('APP_PATH') || http_response_code(403).die('403 Direct Access Denied!');
+defined('APP_PATH') || http_response_code(403) . die('403 Direct Access Denied!');
 
 use InvalidArgumentException;
 use Laika\Core\Config;
@@ -98,8 +99,8 @@ class RedisStorage
     {
         $key = $this->prefix . ':' . $key;
         return ($this->expire > 0)
-                ? $this->client->setex($key, $this->expire, serialize($value))
-                : $this->client->set($key, serialize($value));
+            ? $this->client->setex($key, $this->expire, serialize($value))
+            : $this->client->set($key, serialize($value));
     }
 
     /**

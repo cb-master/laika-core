@@ -19,7 +19,7 @@ defined('APP_PATH') || http_response_code(403) . die('403 Direct Access Denied!'
 use Laika\Core\{Console\Command, App\Router};
 
 // Make Controller Class
-class Lists Extends Command
+class Lists extends Command
 {
     // App Controller Path
     protected string $path = APP_PATH . '/lf-routes';

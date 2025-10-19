@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace Laika\Core;
 
 // Deny Direct Access
-defined('APP_PATH') || http_response_code(403).die('403 Direct Access Denied!');
+defined('APP_PATH') || http_response_code(403) . die('403 Direct Access Denied!');
 
 use Laika\Model\ConnectionManager;
 use Laika\Session\Session;
@@ -123,7 +123,7 @@ class Auth
 
         // Set Session
         Session::set($obj->cookie, $obj->event, $obj->for);
-        
+
         return $obj->event;
     }
 
@@ -148,15 +148,15 @@ class Auth
         $stmt->execute([':event' => $obj->event, ':expire' => $obj->time]);
 
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
-        
-        if(!$row){
+
+        if (!$row) {
             Session::pop($obj->cookie, $obj->for);
             return null;
         }
-        
+
         $obj->user = json_decode($row['data'], true);
 
-        if(($row['expire'] - $obj->time) < ($obj->ttl / 2)) self::regenerate();
+        if (($row['expire'] - $obj->time) < ($obj->ttl / 2)) self::regenerate();
 
         return $obj->user;
     }

@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace Laika\Core;
 
 // Deny Direct Access
-defined('APP_PATH') || http_response_code(403).die('403 Direct Access Denied!');
+defined('APP_PATH') || http_response_code(403) . die('403 Direct Access Denied!');
 
 use InvalidArgumentException;
 
@@ -86,12 +86,12 @@ class Directory
     public static function pop(string $path): bool
     {
         // Return if Not Exists
-        if(!self::exists($path)) {
+        if (!self::exists($path)) {
             return true;
         }
-  
+
         // Empty the Directory
-        if(!self::empty($path)) {
+        if (!self::empty($path)) {
             return false;
         }
 
@@ -140,14 +140,14 @@ class Directory
 
         // Normalize extension filter
         $extList = is_array($ext) ? array_map('strtolower', $ext) : [$ext];
-        $extList = array_map(fn ($e) => ltrim($e, '.'), $extList);
+        $extList = array_map(fn($e) => ltrim($e, '.'), $extList);
 
         foreach ($iterator as $item) {
             if ($item->isDir()) {
                 if ($includeDirs) {
                     $result[] = $item->getPathname();
                 }
-            }else{
+            } else {
                 if ($extList !== ['*']) {
                     $fileExt = strtolower(pathinfo($item->getFilename(), PATHINFO_EXTENSION));
                     if (!in_array($fileExt, $extList, true)) {

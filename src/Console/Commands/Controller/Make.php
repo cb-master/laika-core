@@ -19,7 +19,7 @@ defined('APP_PATH') || http_response_code(403) . die('403 Direct Access Denied!'
 use Laika\Core\{Console\Command, Directory};
 
 // Make Controller Class
-class Make Extends Command
+class Make extends Command
 {
     // App Controller Path
     protected string $path = APP_PATH . '/lf-app/Controller';
@@ -47,7 +47,7 @@ class Make Extends Command
 
         // View Name
         $view = $params[1] ?? 'default';
-        
+
         // Get Controller & View Parts
         $controller_parts   =   $this->parts($params[0]);
         $view_parts         =   $this->parts($view, false);
@@ -106,7 +106,7 @@ class Make Extends Command
             '{{NAMESPACE}}',
             '{{NAME}}',
             '{{VIEW}}'
-        ],[
+        ], [
             $controller_parts['namespace'],
             $controller_parts['name'],
             trim($view, '/')
@@ -128,7 +128,7 @@ class Make Extends Command
                 return;
             }
         }
-        
+
         $this->info("Controller Created Successfully: '{$params[0]}' With View: '{$view}'");
         return;
     }

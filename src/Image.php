@@ -9,8 +9,11 @@
  * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
  */
 
-// Namespace
+
 namespace Laika\Core;
+
+// Deny Direct Access
+defined('APP_PATH') || http_response_code(403) . die('403 Direct Access Denied!');
 
 use GdImage;
 use InvalidArgumentException;
@@ -73,11 +76,11 @@ class Image
      */
     public function resize(int $width, int $height, bool $keepAspect = true): self
     {
-        if($keepAspect){
+        if ($keepAspect) {
             $ratio = $this->width / $this->height;
-            if($width / $height > $ratio){
+            if ($width / $height > $ratio) {
                 $width = (int)($height * $ratio);
-            }else{
+            } else {
                 $height = (int)($width / $ratio);
             }
         }
@@ -104,8 +107,10 @@ class Image
     public function crop(int $x, int $y, int $width, int $height): self
     {
         $cropped = imagecrop($this->image, [
-            'x' => $x, 'y' => $y,
-            'width' => $width, 'height' => $height
+            'x' => $x,
+            'y' => $y,
+            'width' => $width,
+            'height' => $height
         ]);
 
         if ($cropped === false) {
@@ -130,11 +135,11 @@ class Image
     {
         $mode = strtolower($mode);
         // Throw InvalidArgumentException if Mode is not Acceptable.
-        if(!in_array($mode, ['fit','cover'])) {
+        if (!in_array($mode, ['fit', 'cover'])) {
             throw new InvalidArgumentException("Unsupported Mode: '{$mode}'");
         }
 
-        if($mode === 'cover'){
+        if ($mode === 'cover') {
             $originalRatio = $this->width / $this->height;
             $targetRatio = $width / $height;
 
@@ -261,7 +266,7 @@ class Image
     {
         $format = strtolower($format);
 
-        $this->mime = match($format){
+        $this->mime = match ($format) {
             'jpg', 'jpeg' => 'image/jpeg',
             'png'         => 'image/png',
             'gif'         => 'image/gif',
@@ -290,11 +295,11 @@ class Image
             'image/gif'               => imagegif($this->image, $path),
             'image/webp'              => imagewebp($this->image, $path, $quality),
             'image/bmp'               => function_exists('imagebmp')
-                                         ? imagebmp($this->image, $path)
-                                         : throw new \RuntimeException("Cannot save BMP: not supported"),
+                ? imagebmp($this->image, $path)
+                : throw new \RuntimeException("Cannot save BMP: not supported"),
             'image/avif'              => function_exists('imageavif')
-                                         ? imageavif($this->image, $path, $quality)
-                                         : throw new \RuntimeException("Cannot save AVIF: not supported"),
+                ? imageavif($this->image, $path, $quality)
+                : throw new \RuntimeException("Cannot save AVIF: not supported"),
             default                   => throw new \RuntimeException("Cannot save unsupported image type: {$this->mime}")
         };
     }
@@ -311,17 +316,17 @@ class Image
             imagesavealpha($this->image, true);
         }
 
-        match($this->mime){
+        match ($this->mime) {
             'image/jpeg', 'image/jpg' => imagejpeg($this->image),
             'image/png'               => imagepng($this->image),
             'image/gif'               => imagegif($this->image),
             'image/webp'              => imagewebp($this->image),
             'image/bmp'               => function_exists('imagebmp')
-                                         ? imagebmp($this->image)
-                                         : throw new \RuntimeException("Cannot output BMP: not supported"),
+                ? imagebmp($this->image)
+                : throw new \RuntimeException("Cannot output BMP: not supported"),
             'image/avif'              => function_exists('imageavif')
-                                         ? imageavif($this->image)
-                                         : throw new \RuntimeException("Cannot output AVIF: not supported"),
+                ? imageavif($this->image)
+                : throw new \RuntimeException("Cannot output AVIF: not supported"),
             default                   => throw new \RuntimeException("Cannot output unsupported image type: {$this->mime}")
         };
 
@@ -336,17 +341,17 @@ class Image
     {
         ob_start();
 
-        match($this->mime){
+        match ($this->mime) {
             'image/jpeg', 'image/jpg' => imagejpeg($this->image),
             'image/png'               => imagepng($this->image),
             'image/gif'               => imagegif($this->image),
             'image/webp'              => imagewebp($this->image),
             'image/bmp'               => function_exists('imagebmp')
-                                        ? imagebmp($this->image)
-                                        : throw new \RuntimeException("Cannot output BMP: not supported"),
+                ? imagebmp($this->image)
+                : throw new \RuntimeException("Cannot output BMP: not supported"),
             'image/avif'              => function_exists('imageavif')
-                                        ? imageavif($this->image)
-                                        : throw new \RuntimeException("Cannot output AVIF: not supported"),
+                ? imageavif($this->image)
+                : throw new \RuntimeException("Cannot output AVIF: not supported"),
             default                   => throw new \RuntimeException("Unsupported image type: {$this->mime}"),
         };
 
@@ -360,7 +365,7 @@ class Image
      * Get Image Width
      * @return int
      */
-    public function getWidth(): int 
+    public function getWidth(): int
     {
         return $this->width;
     }
@@ -369,7 +374,7 @@ class Image
      * Get Image Height
      * @return int
      */
-    public function getHeight(): int 
+    public function getHeight(): int
     {
         return $this->height;
     }
@@ -378,7 +383,7 @@ class Image
      * Get Image Mime Type
      * @return string
      */
-    public function getMime(): string 
+    public function getMime(): string
     {
         return $this->mime;
     }
@@ -412,17 +417,17 @@ class Image
      */
     protected function load(): void
     {
-        $this->image = match($this->mime){
+        $this->image = match ($this->mime) {
             'image/jpeg', 'image/jpg' => imagecreatefromjpeg($this->path),
             'image/png'               => imagecreatefrompng($this->path),
             'image/gif'               => imagecreatefromgif($this->path),
             'image/webp'              => imagecreatefromwebp($this->path),
             'image/bmp'               => function_exists('imagecreatefrombmp')
-                                         ? imagecreatefrombmp($this->path)
-                                         : throw new \RuntimeException("BMP not supported"),
+                ? imagecreatefrombmp($this->path)
+                : throw new \RuntimeException("BMP not supported"),
             'image/avif'              => function_exists('imagecreatefromavif')
-                                         ? imagecreatefromavif($this->path)
-                                         : throw new \RuntimeException("AVIF not supported"),
+                ? imagecreatefromavif($this->path)
+                : throw new \RuntimeException("AVIF not supported"),
             default                   => throw new \RuntimeException("Unsupported image type: {$this->mime}")
         };
     }

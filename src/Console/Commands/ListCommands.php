@@ -18,7 +18,7 @@ defined('APP_PATH') || http_response_code(403) . die('403 Direct Access Denied!'
 
 use Laika\Core\Console\Command;
 
-class ListCommands Extends Command
+class ListCommands extends Command
 {
     /**
      * Run the command to create a new controller.

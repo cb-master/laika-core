@@ -11,7 +11,6 @@
 
 declare(strict_types=1);
 
-// Namespace
 namespace Laika\Core\Console\Commands\View;
 
 // Deny Direct Access
@@ -19,7 +18,7 @@ defined('APP_PATH') || http_response_code(403) . die('403 Direct Access Denied!'
 
 use Laika\Core\{Console\Command,Directory};
 
-class Make Extends Command
+class Make extends Command
 {
     // App View Path
     protected string $path = APP_PATH . '/lf-templates';

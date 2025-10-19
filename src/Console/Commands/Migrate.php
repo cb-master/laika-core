@@ -18,10 +18,10 @@ defined('APP_PATH') || http_response_code(403) . die('403 Direct Access Denied!'
 
 use Laika\Core\{Console\Command, Config};
 use Laika\Model\ConnectionManager;
-use Laika\Model\{Schema,DB};
+use Laika\Model\{Schema, DB};
 use Exception;
 
-class Migrate Extends Command
+class Migrate extends Command
 {
     /**
      * Default Options Keys
@@ -35,7 +35,7 @@ class Migrate Extends Command
             'time.format'   =>  'Y-M-d H:i:s',
             'dbsession'     =>  'yes',
             'developermode' =>  'yes',
-            'app.path'      =>  realpath(APP_PATH ?? __DIR__.'/../../../../../../'),
+            'app.path'      =>  realpath(APP_PATH ?? __DIR__ . '/../../../../../../'),
             'admin.icon'    =>  'favicon.ico',
             'admin.logo'    =>  'logo.png',
             'csrf.lifetime' =>  'logo.png',
@@ -56,19 +56,19 @@ class Migrate Extends Command
 
             // Connectin=on Set for Schema
             Schema::setConnection($connection_name);
-            
+
             // Make Table
-            Schema::create('options', function($e){
+            Schema::create('options', function ($e) {
                 $e->id('id')
-                  ->string('opt_key', 255)
-                  ->text('opt_value', true)
-                  ->enum('opt_default', ['yes','no'], 'no')
-                  ->index('opt_key', 255);
+                    ->string('opt_key', 255)
+                    ->text('opt_value', true)
+                    ->enum('opt_default', ['yes', 'no'], 'no')
+                    ->index('opt_key', 255);
             });
 
             // Insert Default Data
             $db = DB::getInstance();
-            
+
             // Get Old Data if Exist
             $old_data = $db->table('options')->select('opt_key')->get();
             if (!empty($old_data)) {
@@ -77,14 +77,14 @@ class Migrate Extends Command
 
             $rows = [];
             foreach ($this->defaulKeys() as $key => $val) {
-                $rows[] = ['opt_key' => $key, 'opt_value'=>$val, 'opt_default'=>'yes'];
+                $rows[] = ['opt_key' => $key, 'opt_value' => $val, 'opt_default' => 'yes'];
             }
             // Insert Options
             $db->table('options')->insertMany($rows);
 
             // Create Secret Config File if Not Exist
             if (!Config::has('secret')) {
-                Config::create('secret', ['key'=>bin2hex(random_bytes(64))]);
+                Config::create('secret', ['key' => bin2hex(random_bytes(64))]);
             }
             // Create Secret Key Value Not Exist or Empty
             if (!Config::has('secret', 'key')) {

@@ -43,10 +43,10 @@ final class Api
     // Initiate API Object
     public function __construct()
     {
-        $this->accepted         =   ['application/json','application/x-www-form-urlencoded'];
+        $this->accepted         =   ['application/json', 'application/x-www-form-urlencoded'];
         $this->contentType      =   strtolower(strtok($_SERVER['CONTENT_TYPE'] ?? 'application/json', ';'));
         $this->method           =   Http\Request::method();
-        $this->acceptableMethods=   ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'];
+        $this->acceptableMethods =   ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'];
         $this->allowedOrigin    =   '*';
 
         // Handle CORS preflight
@@ -132,7 +132,7 @@ final class Api
         }
 
         $obj = new Token();
-        if(!$obj->validateToken($token)){
+        if (!$obj->validateToken($token)) {
             $this->send([
                 "status"    => 401,
                 "message"   => "Token Expired",
@@ -150,19 +150,19 @@ final class Api
      */
     public function send(array $payload, int $status = 200): never
     {
-        if(!in_array($this->method, $this->acceptableMethods)){
+        if (!in_array($this->method, $this->acceptableMethods)) {
             $status = 415;
             $payload = [
                 "status"    =>  $status,
                 "data"      =>  [],
                 "message"   =>  "Unsupported Method: '{$this->method}'",
-                "context"   =>  "Accepted Methods Are: ".implode(', ', $this->acceptableMethods),
+                "context"   =>  "Accepted Methods Are: " . implode(', ', $this->acceptableMethods),
                 "timestamp" =>  date('c')
             ];
         }
 
         // Add Timestamp if Doesn't Exists
-        if(!isset($payload['timestamp'])) $payload = array_merge($payload, ['timestamp'=>date('c')]);
+        if (!isset($payload['timestamp'])) $payload = array_merge($payload, ['timestamp' => date('c')]);
 
         // Build body
         $body = json_encode($payload, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_FORCE_OBJECT);
