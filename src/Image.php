@@ -11,6 +11,12 @@
 
 namespace Laika\Core;
 
+// Deny Direct Access
+if (php_sapi_name() !== 'cli' && !defined('APP_PATH')) {
+    http_response_code(403);
+    exit('Direct Access Denied!');
+}
+
 use GdImage;
 use InvalidArgumentException;
 

@@ -10,6 +10,12 @@
 
 declare(strict_types=1);
 
+// Deny Direct Access
+if (php_sapi_name() !== 'cli' && !defined('APP_PATH')) {
+    http_response_code(403);
+    exit('Direct Access Denied!');
+}
+
 use Laika\Core\{App\Router, Config, Filter, Uri, Option};
 
 // Dump Data & Die

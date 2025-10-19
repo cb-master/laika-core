@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace laika\Core\Console;
 
 // Deny Direct Access
-// defined('APP_PATH') || http_response_code(403).die('403 Direct Access Denied!');
 if (php_sapi_name() !== 'cli' && !defined('APP_PATH')) {
     http_response_code(403);
     exit('Direct Access Denied!');

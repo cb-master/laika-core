@@ -14,12 +14,10 @@ declare(strict_types=1);
 namespace Laika\Core\Console\Commands\Controller;
 
 // Deny Direct Access
-// defined('APP_PATH') || http_response_code(403) . die('403 Direct Access Denied!');
 if (php_sapi_name() !== 'cli' && !defined('APP_PATH')) {
     http_response_code(403);
     exit('Direct Access Denied!');
 }
-
 use Laika\Core\Console\Command;
 
 // Remove Controller Class
