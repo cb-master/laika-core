@@ -11,9 +11,6 @@
 
 namespace Laika\Core;
 
-// Deny Direct Access
-defined('APP_PATH') || http_response_code(403) . die('403 Direct Access Denied!');
-
 class File
 {
     // Path

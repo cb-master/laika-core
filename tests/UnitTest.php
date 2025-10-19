@@ -1,16 +1,8 @@
-```
-
-
-## tests/UnitTest.php
-
-
-```php
 <?php
+namespace Laika\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Laika\Core\App\Router;
-
-
 class UnitTest extends TestCase
 {    
     public function testRenderSimple()
