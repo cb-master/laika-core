@@ -69,7 +69,9 @@ class Zip
 
         foreach ($files as $file) {
             // Throw Exception if File Doesn't Exists
-            if (!file_exists($file)) throw new InvalidArgumentException("Invalid Path '{$file}' Detected!");
+            if (!file_exists($file)) {
+                throw new InvalidArgumentException("Invalid Path '{$file}' Detected!");
+            }
 
             $localName = $baseDir ? substr($file, strlen($baseDir) + 1) : basename($file);
 

@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Laika\Core;
 
-final class Api
+class Api
 {
     /**
      * @var array $accepted Application Types
@@ -162,7 +162,9 @@ final class Api
         }
 
         // Add Timestamp if Doesn't Exists
-        if (!isset($payload['timestamp'])) $payload = array_merge($payload, ['timestamp' => date('c')]);
+        if (!isset($payload['timestamp'])) {
+            $payload = array_merge($payload, ['timestamp' => date('c')]);
+        }
 
         // Build body
         $body = json_encode($payload, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_FORCE_OBJECT);
@@ -201,7 +203,9 @@ final class Api
      */
     private function applyCors(): void
     {
-        if (PHP_SAPI === 'cli') return;
+        if (PHP_SAPI === 'cli') {
+            return;
+        }
 
         Http\Response::setHeader([
             "Access-Control-Allow-Origin"   =>  $this->allowedOrigin,

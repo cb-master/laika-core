@@ -230,7 +230,7 @@ class Router
     public static function middlewareGroup(string $name, array $middlewares): self
     {
         self::$middlewareGroups[$name] = $middlewares;
-        return new self;
+        return new self();
     }
 
     /**
@@ -637,7 +637,7 @@ class Router
 
     /**
      * Execute Callback
-     * @param callable|array|string $callback Example: HomeController@index or ['HomeController','index'] or Anonimous function 
+     * @param callable|array|string $callback Example: HomeController@index or ['HomeController','index'] or Anonimous function
      * @param array ...$params Parameters from Slug & Middlewares
      */
     protected static function executeCallback(callable|string $callback, array $params)
@@ -751,8 +751,8 @@ class Router
     private static function buildPipeline(array $data): array
     {
         // Sort global middleware
-        usort(self::$globalBefore, fn ($a, $b) => $a['priority'] <=> $b['priority']);
-        usort(self::$globalAfter, fn ($a, $b) => $a['priority'] <=> $b['priority']);
+        usort(self::$globalBefore, fn($a, $b) => $a['priority'] <=> $b['priority']);
+        usort(self::$globalAfter, fn($a, $b) => $a['priority'] <=> $b['priority']);
 
         $before = array_column(self::$globalBefore, 'name');
         $after  = array_column(self::$globalAfter, 'name');

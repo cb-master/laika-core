@@ -24,9 +24,8 @@ class Meta
    /**
     * Get Version Info from PHP File
     * @param ?string $path - Required A Path of PHP File
-    * @return array - Returns an associative array of meta information extracted from the PHP file's doc comments
     * @throws InvalidArgumentException - Throws an exception if the provided path is not a valid directory
-    * @return array<string,string>
+    * @return array - Returns an associative array of meta information extracted from the PHP file's doc comments
     */
    public static function version(string $path): array
    {
