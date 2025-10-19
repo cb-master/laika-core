@@ -13,7 +13,11 @@ declare(strict_types=1);
 
 namespace Laika\Core\Http;
 
-defined('APP_PATH') || http_response_code(403) . die('403 Direct Access Denied!');
+// Deny Direct Access
+if (php_sapi_name() !== 'cli' && !defined('APP_PATH')) {
+    http_response_code(403);
+    exit('Direct Access Denied!');
+}
 
 use Laika\Core\{Config, Token, Uri};
 

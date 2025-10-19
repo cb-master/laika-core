@@ -11,9 +11,12 @@
 declare(strict_types=1);
 
 // Deny Direct Access
-defined('APP_PATH') || http_response_code(403).die('403 Direct Access Denied!');
+if (php_sapi_name() !== 'cli' && !defined('APP_PATH')) {
+    http_response_code(403);
+    exit('Direct Access Denied!');
+}
 
-use CBM\Core\Uri;
+use Laika\Core\Uri;
 
 ###################################################################
 /*------------------------- URI FILTERS -------------------------*/
@@ -28,5 +31,6 @@ add_filter('uri.make', function(string|array $slug = '', array $queries = []): s
     // Get Slug
     $slug = is_array($slug) ? $slug : [$slug];
     $slug = implode('/', $slug);
-    return Uri::build($slug, $queries);
+    $uri = new Uri();
+    return $uri->build($slug, $queries);
 });

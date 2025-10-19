@@ -11,9 +11,12 @@
 declare(strict_types=1);
 
 // Deny Direct Access
-defined('APP_PATH') || http_response_code(403).die('403 Direct Access Denied!');
+if (php_sapi_name() !== 'cli' && !defined('APP_PATH')) {
+    http_response_code(403);
+    exit('Direct Access Denied!');
+}
 
-use CBM\Core\Uri;
+use Laika\Core\Uri;
 
 ####################################################################
 /*------------------------- PAGE FILTERS -------------------------*/
@@ -30,7 +33,15 @@ add_filter('page.number', function(): int {
 });
 
 // Next Page Number
-add_filter('page.next', function(){ return Uri::incrementQuery(); });
+add_filter('page.next', function()
+{
+    $uri = new Uri();
+    return $uri->incrementQuery();
+});
 
 // Previous Page Number
-add_filter('page.previous', function(){ return Uri::decrementQuery(); });
+add_filter('page.previous', function()
+{
+    $uri = new Uri();
+    return $uri->decrementQuery();
+});

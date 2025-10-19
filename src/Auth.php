@@ -14,19 +14,17 @@ declare(strict_types=1);
 namespace Laika\Core;
 
 // Deny Direct Access
-defined('APP_PATH') || http_response_code(403) . die('403 Direct Access Denied!');
+if (php_sapi_name() !== 'cli' && !defined('APP_PATH')) {
+    http_response_code(403);
+    exit('Direct Access Denied!');
+}
 
 use Laika\Model\ConnectionManager;
 use Laika\Session\Session;
-use Exception;
-use Throwable;
 use PDO;
 
 class Auth
 {
-    // Instance Object
-    private static ?object $instance = null;
-
     // Session For
     private string $for;
 
@@ -53,9 +51,9 @@ class Auth
 
     /**
      * Initiate Auth Session
-     * @param string $for. Auth Running For. Example: 'admin'/client
+     * @param string $for. Auth Running For. Example: ADMIN/CLIENT. Default is APP
      */
-    private function __construct(string $for)
+    public function __construct(string $for = 'APP')
     {
         $this->for = strtolower($for);
         $this->pdo = ConnectionManager::get();
@@ -65,66 +63,43 @@ class Auth
     }
 
     /**
-     * Config Instance
-     * @param string $for. Auth Running For. Example: 'admin'/client
-     * @return self
-     */
-    public static function config(string $for = 'APP'): self
-    {
-        self::$instance ??= new self($for);
-        // Create Table if Not Exist
-        try {
-            $makeSql = "CREATE TABLE IF NOT EXISTS " . self::$instance->table . " (event VARCHAR(64) NOT NULL,data TEXT NOT NULL,expire INT NOT NULL,created INT NOT NULL, INDEX(event), INDEX(expire), INDEX(created));";
-            $stmt = self::$instance->pdo->prepare($makeSql);
-            $stmt->execute();
-        } catch (Throwable $th) {
-            option('debug', true) ? ErrorHandler::handleException($th) : false;
-        }
-
-        return self::$instance;
-    }
-
-    /**
      * Checkng TTL
      * @param int $ttl Required TTL Numer. Sytem Default is 1800 Seconds or 30 Minutes
      * @return void
      */
-    public static function setTtl(int $ttl): void
+    public function setTtl(int $ttl): void
     {
-        $obj = self::$instance ?? throw new Exception("Please Initiate Auth::config() First");
-        $obj->ttl = $ttl;
+        $this->ttl = $ttl;
     }
 
     /**
      * Create Auth Token in DB Table
      * @param array $user User Data
+     * @return string Event ID
      */
-    public static function create(array $user): string
+    public function create(array $user): string
     {
-        // Get Instance & Set User
-        $obj = self::$instance ?? throw new Exception("Please Initiate Auth::config() First");
-        $obj->user = $user;
+        $this->user = $user;
 
         // Get Event ID
-        $obj->event = bin2hex(random_bytes(32));
+        $this->event = bin2hex(random_bytes(32));
         // Set Expire Time
-        $time = $obj->time;
-        $expire = $time + $obj->ttl;
+        $expire = $this->time + $this->ttl;
         // Make SQL
-        $sql = "INSERT INTO {$obj->table} (event, data, expire, created) VALUES (:event, :data, :expire, :created)";
-        $stmt = $obj->pdo->prepare($sql);
+        $sql = "INSERT INTO {$this->table} (event, data, expire, created) VALUES (:event, :data, :expire, :created)";
+        $stmt = $this->pdo->prepare($sql);
 
         $stmt->execute([
-            ':event'    =>  $obj->event,
+            ':event'    =>  $this->event,
             ':data'     =>  json_encode($user),
             ':expire'   =>  $expire,
-            ':created'  =>  $time,
+            ':created'  =>  $this->time,
         ]);
 
         // Set Session
-        Session::set($obj->cookie, $obj->event, $obj->for);
+        Session::set($this->cookie, $this->event, $this->for);
 
-        return $obj->event;
+        return $this->event;
     }
 
     /**
@@ -132,61 +107,52 @@ class Auth
      * Check User is Authenticated and Not Expired
      * @return ?array
      */
-    public static function user(): ?array
+    public function user(): ?array
     {
-        // Check Instance Loaded
-        $obj = self::$instance ?? throw new Exception("Please Initiate Auth::config() First");
-
         // Clear Session if Event Mssing
-        if (empty($obj->event)) {
-            Session::pop($obj->cookie, $obj->for);
+        if (empty($this->event)) {
+            Session::pop($this->cookie, $this->for);
             return null;
         }
 
         // Get DB Data
-        $stmt = $obj->pdo->prepare("SELECT data, expire FROM {$obj->table} WHERE event = :event AND expire > :expire LIMIT 1");
-        $stmt->execute([':event' => $obj->event, ':expire' => $obj->time]);
+        $stmt = $this->pdo->prepare("SELECT data, expire FROM {$this->table} WHERE event = :event AND expire > :expire LIMIT 1");
+        $stmt->execute([':event' => $this->event, ':expire' => $this->time]);
 
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if (!$row) {
-            Session::pop($obj->cookie, $obj->for);
+            Session::pop($this->cookie, $this->for);
             return null;
         }
 
-        $obj->user = json_decode($row['data'], true);
+        $this->user = json_decode($row['data'], true);
 
-        if (($row['expire'] - $obj->time) < ($obj->ttl / 2)) {
+        if (($row['expire'] - $this->time) < ($this->ttl / 2)) {
             self::regenerate();
         }
 
-        return $obj->user;
+        return $this->user;
     }
 
     /**
      * Regenerate Auth Event ID
      * @return string
      */
-    public static function regenerate(): string
+    public function regenerate(): string
     {
-        // Check Instance Loaded
-        $obj = self::$instance ?? throw new Exception("Please Initiate Auth::config() First");
-
-        self::destroy();
-        return self::create($obj->user);
+        $this->destroy();
+        return $this->create($this->user);
     }
 
     /**
      * Destroy Auth Event ID
      * @return void
      */
-    public static function destroy(): void
+    public function destroy(): void
     {
-        // Check Instance Loaded
-        $obj = self::$instance ?? throw new Exception("Please Initiate Auth::config() First");
-
-        $stmt = $obj->pdo->prepare("DELETE FROM {$obj->table} WHERE event = :event");
-        $stmt->execute([':event' => $obj->event]);
-        Session::pop($obj->cookie, $obj->for);
+        $stmt = $this->pdo->prepare("DELETE FROM {$this->table} WHERE event = :event");
+        $stmt->execute([':event' => $this->event]);
+        Session::pop($this->cookie, $this->for);
     }
 }

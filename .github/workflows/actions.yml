@@ -176,9 +176,9 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ github.ref_name }}
-          name: "Laika Core - ${{ env.CHANNEL == 'beta' && 'BETA' || 'STABLE' }}"
+          name: "Laika Core - ${{ env.CHANNEL == 'beta' && 'BETA' || 'STABLE' }} - ${{ github.ref_name }}"
           body: |
-            🚀 **Laika Framework Core ${{ env.CHANNEL == 'beta' && 'BETA' || 'STABLE' }} Release**
+            🚀 **Laika Framework Core ${{ env.CHANNEL == 'beta' && 'BETA' || 'STABLE' }} - ${{ github.ref_name }} Release**
 
             **Tag:** ${{ github.ref_name }}
             **Commit:** ${{ github.sha }}

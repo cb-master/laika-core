@@ -12,6 +12,15 @@
             "helpers/hooks.php"
         ]
     },
+    "autoload-dev": {
+        "psr-4": {
+            "Laika\\Tests\\": "tests/"
+        },
+        "files": [
+            "helpers/functions.php",
+            "helpers/hooks.php"
+        ]
+    },
     "authors": [
         {
             "name": "Cloud Bill Master",
@@ -38,7 +47,7 @@
     "prefer-stable": true,
     "scripts": {
         "test": [
-            "@php vendor/bin/phpunit --configuration phpunit.xml.dist --colors=always --testdox || true"
+            "@php vendor/bin/phpunit --configuration phpunit.xml.dist --colors=always --testdox"
         ],
         "lint": "php-cs-fixer fix --dry-run --diff"
     }
