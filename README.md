@@ -5,9 +5,12 @@ Laika PHP Framework Core
 
 ## PHP Compatibility
 
-| PHP Version | Compatibility |
-|--------------|---------------|
-| **8.1** | ![8.1](https://github.com/ShowketAhmed/laika-framework/actions/workflows/actions.yml/badge.svg?branch=main&label=8.1) |
-| **8.2** | ![8.2](https://github.com/ShowketAhmed/laika-framework/actions/workflows/actions.yml/badge.svg?branch=main&label=8.2) |
-| **8.3** | ![8.3](https://github.com/ShowketAhmed/laika-framework/actions/workflows/actions.yml/badge.svg?branch=main&label=8.3) |
+## 🧩 PHP Compatibility Matrix
+
+| PHP Version | Status | Notes |
+|--------------|--------|-------|
+| **8.1** | ✅ | Stable & fully tested |
+| **8.2** | ✅ | Stable & fully tested |
+| **8.3** | ✅ | Stable & fully tested |
+| **8.4** | ✅ | Stable & fully tested |
 
