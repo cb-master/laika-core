@@ -1,2 +1,2 @@
-# lmvc_core
+# Laika Core
 Laika PHP Framework Core
