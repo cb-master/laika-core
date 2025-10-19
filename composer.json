@@ -4,13 +4,13 @@
     "type": "package",
     "license": "MIT",
     "autoload": {
-        "files": [
-            "helpers/functions.php",
-            "helpers/filters.php"
-        ],
         "psr-4": {
             "Laika\\Core\\": "src/"
-        }
+        },
+        "files": [
+            "helpers/functions.php",
+            "helpers/hooks.php"
+        ]
     },
     "authors": [
         {

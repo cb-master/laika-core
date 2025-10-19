@@ -66,17 +66,20 @@ function purify(array $data): array
 function redirect(string|array $slug, ?array $params = null): void
 {
     // Redirect if $slug is an URL
-    if(parse_url($slug, PHP_URL_HOST)){
+    if (parse_url($slug, PHP_URL_HOST)) {
         header('Location:'.$slug, true);
         die();
     }
     // Convert to String if Slug is Array
-    if(is_array($slug)) $slug = implode('/', array_map('trim', $slug));
+    if (is_array($slug)) {
+        $slug = implode('/', array_map('trim', $slug));
+    }
     $slug = str_replace('\\', '/', $slug);
     $slug = trim($slug, '/');
 
     // Redirect
-    header('Location:'.Uri::build($slug, $params ?: []), true);
+    $uri = new Uri();
+    header('Location:' . $uri->build($slug, $params ?: []), true);
     die();
 }
 
@@ -121,7 +124,8 @@ function option(string $key, mixed $default = null): mixed
  */
 function host(): string
 {
-    return option('app.host') ?: Uri::base();
+    $uri = new Uri();
+    return option('app.host') ?: $uri->base();
 }
 
 /**

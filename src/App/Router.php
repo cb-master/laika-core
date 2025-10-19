@@ -72,7 +72,8 @@ class Router
         // Ensure leading slash
         $uri = '/' . trim($uri, '/');
 
-        return $absolute ? Uri::base().trim($uri, '/') : $uri;
+        $obj = new Uri();
+        return $absolute ? $obj->base().trim($uri, '/') : $uri;
     }
 
     /**
@@ -324,7 +325,8 @@ class Router
     public static function dispatch(): void
     {
         $method = strtoupper($_SERVER['REQUEST_METHOD'] ?? 'GET');
-        $path = self::normalize('/' . Uri::path());
+        $obj = new Uri();
+        $path = self::normalize('/' . $obj->path());
 
         // Fallback If Http Method Doesn't Exists
         if (!isset(self::$routes[$method])) goto fallback;
