@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Laika PHP MVC Framework
  * Author: Showket Ahmed
@@ -10,13 +11,12 @@
 
 declare(strict_types=1);
 
-// Namespace
-namespace CBM\Core\Console\Commands\View;
+namespace Laika\Core\Console\Commands\View;
 
 // Deny Direct Access
 defined('APP_PATH') || http_response_code(403) . die('403 Direct Access Denied!');
 
-use CBM\Core\{Console\Command, Directory};
+use Laika\Core\{Console\Command, Directory};
 
 // Rename View Class
 class Rename Extends Command
@@ -34,11 +34,12 @@ class Rename Extends Command
      * Run The Command to Remove a View.
      *
      * @param array $params
+     * @return void
      */
     public function run(array $params): void
     {
         // Check Parameters
-        if(count($params) < 2){
+        if (count($params) < 2) {
             $this->error("Usage: laika rename:view <old_name> <new_name>");
             return;
         }
@@ -48,13 +49,13 @@ class Rename Extends Command
         $new = $params[1];
 
         // Check Old View Name is Valid
-        if(!preg_match($this->exp, $old)){
+        if (!preg_match($this->exp, $old)) {
             // Invalid View Name
             $this->error("Invalid Old View Name: '{$old}'");
             return;
         }
         // Check New View Name is Valid
-        if(!preg_match($this->exp, $new)){
+        if (!preg_match($this->exp, $new)) {
             // Invalid View Name
             $this->error("Invalid New View Name: '{$old}'");
             return;
@@ -72,42 +73,41 @@ class Rename Extends Command
         $new_file = "{$this->new_path}/{$new_parts['name']}.tpl.php";
 
         // Check Old View Path is Valid
-        if(!is_file($old_file)){
+        if (!is_file($old_file)) {
             $this->error("Invalid View Name or Path: '$old'");
             return;
         }
 
         // Check New Path Exist
-        if(!Directory::exists($this->new_path)){
+        if (!Directory::exists($this->new_path)) {
             Directory::make($this->new_path);
         }
 
         // Check New View Path is Valid
-        if(is_file($new_file)){
+        if (is_file($new_file)) {
             $this->error("New View Already Exist: '$old'");
             return;
         }
 
         // Get Contents
         $content = file_get_contents($old_file);
-        if($content === false){
+        if ($content === false) {
             $this->error("Failed to Read View: '{$old}'");
             return;
         }
 
         // Create New View File
-        if(file_put_contents($new_file, $content) === false){
+        if (file_put_contents($new_file, $content) === false) {
             $this->error("Failed to Create View: {$new}");
             return;
         }
 
         // Remove Old View File
-
-        if(!unlink($old_file)){
+        if (!unlink($old_file)) {
             $this->error("Failed to Remove View: '{$old_file}'");
             return;
         }
-        
+
         $this->info("View Renamed Successfully: '{$old}'->'{$new}'");
         return;
     }

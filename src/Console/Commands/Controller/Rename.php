@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Laika PHP MVC Framework
  * Author: Showket Ahmed
@@ -11,12 +12,12 @@
 declare(strict_types=1);
 
 // Namespace
-namespace CBM\Core\Console\Commands\Controller;
+namespace Laika\Core\Console\Commands\Controller;
 
 // Deny Direct Access
 defined('APP_PATH') || http_response_code(403) . die('403 Direct Access Denied!');
 
-use CBM\Core\{Console\Command, Directory};
+use Laika\Core\{Console\Command, Directory};
 
 // Rename Controller Class
 class Rename Extends Command
@@ -32,11 +33,12 @@ class Rename Extends Command
 
     /**
      * @param array $params
+     * @return void
      */
     public function run(array $params): void
     {
         // Check Parameters
-        if(count($params) < 2){
+        if (count($params) < 2) {
             $this->error("USAGE: laika rename:controller <old_name> <new_name>");
             return;
         }
@@ -46,13 +48,13 @@ class Rename Extends Command
         $new = $params[1];
 
         // Check Old Controller Name is Valid
-        if(!preg_match($this->exp, $old)){
+        if (!preg_match($this->exp, $old)) {
             // Invalid Controller Name
             $this->error("Invalid Old Controller Name: '{$old}'");
             return;
         }
         // Check New Controller Name is Valid
-        if(!preg_match($this->exp, $new)){
+        if (!preg_match($this->exp, $new)) {
             // Invalid Controller Name
             $this->error("Invalid New Controller Name: '{$old}'");
             return;
@@ -67,56 +69,57 @@ class Rename Extends Command
         $this->new_path .= $new_parts['path'];
 
          // Old and New Namespace
-        $old_namespace = "namespace CBM\\App\\Controller{$old_parts['namespace']}";
-        $new_namespace = "namespace CBM\\App\\Controller{$new_parts['namespace']}";
+        $old_namespace = "namespace Laika\\App\\Controller{$old_parts['namespace']}";
+        $new_namespace = "namespace Laika\\App\\Controller{$new_parts['namespace']}";
 
         $old_file = "{$this->old_path}/{$old_parts['name']}.php";
         $new_file = "{$this->new_path}/{$new_parts['name']}.php";
 
         // Check Old Controller Path is Valid
-        if(!is_file($old_file)){
+        if (!is_file($old_file)) {
             $this->error("Invalid Controller Name or Path: '$old'");
             return;
         }
 
         // Check New Path Exist
-        if(!Directory::exists($this->new_path)){
+        if (!Directory::exists($this->new_path)) {
             Directory::make($this->new_path);
         }
 
         // Check New Controller Path is Valid
-        if(is_file($new_file)){
+        if (is_file($new_file)) {
             $this->error("New Controller Already Exist: '$old'");
             return;
         }
 
         // Get Contents
         $content = file_get_contents($old_file);
-        if($content === false){
+        if ($content === false) {
             $this->error("Failed to Read Controller: '{$old}'");
             return;
         }
 
         // Replace Namespace if Not Same
-        if($old_namespace != $new_namespace) $content = preg_replace('/'.preg_quote($old_namespace,'/').'/', $new_namespace, $content);
+        if ($old_namespace != $new_namespace) {
+            $content = preg_replace('/'.preg_quote($old_namespace,'/').'/', $new_namespace, $content);
+        }
 
         // Replace Class Name
         $content = preg_replace("/class {$old_parts['name']}/i", "class {$new_parts['name']}", $content);
 
         // Create New Controller File
-        if(file_put_contents($new_file, $content) === false){
+        if (file_put_contents($new_file, $content) === false) {
             $this->error("Failed to Create Controller: {$new}");
             return;
         }
 
         // Remove Old Controller File
 
-        if(!unlink($old_file)){
+        if (!unlink($old_file)) {
             $this->error("Failed to Remove Controller: '{$old_file}'");
             return;
-        }        
-        
-        
+        }
+
         $this->info("Controller Renamed Successfully: '{$old}'->'{$new}'");
         return;
     }

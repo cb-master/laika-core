@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Laika PHP MVC Framework
  * Author: Showket Ahmed
@@ -10,8 +11,7 @@
 
 declare(strict_types=1);
 
-// Namespace
-namespace CBM\Core\Console;
+namespace Laika\Core\Console;
 
 // Deny Direct Access
 defined('APP_PATH') || http_response_code(403).die('403 Direct Access Denied!');
@@ -34,7 +34,6 @@ class Kernel
         // Register Commands
         $this->registerCommands();
     }
-
     
     public function handle()
     {
@@ -58,34 +57,34 @@ class Kernel
     {
         $this->commands = [
             /* Template Controller Commands */
-            'make:controller'       =>  \CBM\Core\Console\Commands\Controller\Make::class,
-            'rename:controller'     =>  \CBM\Core\Console\Commands\Controller\Rename::class,
-            'pop:controller'        =>  \CBM\Core\Console\Commands\Controller\Pop::class,
-            'list:controller'       =>  \CBM\Core\Console\Commands\Controller\Lists::class,
+            'make:controller'       =>  \Laika\Core\Console\Commands\Controller\Make::class,
+            'rename:controller'     =>  \Laika\Core\Console\Commands\Controller\Rename::class,
+            'pop:controller'        =>  \Laika\Core\Console\Commands\Controller\Pop::class,
+            'list:controller'       =>  \Laika\Core\Console\Commands\Controller\Lists::class,
             /* Middleware Commands */
-            'make:middleware'       =>  \CBM\Core\Console\Commands\Middleware\Make::class,
-            'rename:middleware'     =>  \CBM\Core\Console\Commands\Middleware\Rename::class,
-            'pop:middleware'        =>  \CBM\Core\Console\Commands\Middleware\Pop::class,
-            'list:middleware'       =>  \CBM\Core\Console\Commands\Middleware\Lists::class,
+            'make:middleware'       =>  \Laika\Core\Console\Commands\Middleware\Make::class,
+            'rename:middleware'     =>  \Laika\Core\Console\Commands\Middleware\Rename::class,
+            'pop:middleware'        =>  \Laika\Core\Console\Commands\Middleware\Pop::class,
+            'list:middleware'       =>  \Laika\Core\Console\Commands\Middleware\Lists::class,
             /* Model Commands */
-            'make:model'            =>  \CBM\Core\Console\Commands\Model\Make::class,
-            'rename:model'          =>  \CBM\Core\Console\Commands\Model\Rename::class,
-            'pop:model'             =>  \CBM\Core\Console\Commands\Model\Pop::class,
-            'list:model'            =>  \CBM\Core\Console\Commands\Model\Lists::class,
+            'make:model'            =>  \Laika\Core\Console\Commands\Model\Make::class,
+            'rename:model'          =>  \Laika\Core\Console\Commands\Model\Rename::class,
+            'pop:model'             =>  \Laika\Core\Console\Commands\Model\Pop::class,
+            'list:model'            =>  \Laika\Core\Console\Commands\Model\Lists::class,
             /* View Commands */
-            'make:view'             =>  \CBM\Core\Console\Commands\View\Make::class,
-            'rename:view'           =>  \CBM\Core\Console\Commands\View\Rename::class,
-            'pop:view'              =>  \CBM\Core\Console\Commands\View\Pop::class,
-            'list:view'             =>  \CBM\Core\Console\Commands\View\Lists::class,
+            'make:view'             =>  \Laika\Core\Console\Commands\View\Make::class,
+            'rename:view'           =>  \Laika\Core\Console\Commands\View\Rename::class,
+            'pop:view'              =>  \Laika\Core\Console\Commands\View\Pop::class,
+            'list:view'             =>  \Laika\Core\Console\Commands\View\Lists::class,
             /* Other Commands */
-            'help'                  =>  \CBM\Core\Console\Commands\ListCommands::class,
+            'help'                  =>  \Laika\Core\Console\Commands\ListCommands::class,
             /* Migrate */
-            'migrate'               =>  \CBM\Core\Console\Commands\Migrate::class,
+            'migrate'               =>  \Laika\Core\Console\Commands\Migrate::class,
             /* Route */
-            'list:route'            =>  \CBM\Core\Console\Commands\Route\Lists::class,
+            'list:route'            =>  \Laika\Core\Console\Commands\Route\Lists::class,
             /* Secret Key */
-            'generate:secret'       =>  \CBM\Core\Console\Commands\Secret\Generate::class,
-            'pop:secret'            =>  \CBM\Core\Console\Commands\Secret\Pop::class,
+            'generate:secret'       =>  \Laika\Core\Console\Commands\Secret\Generate::class,
+            'pop:secret'            =>  \Laika\Core\Console\Commands\Secret\Pop::class,
         ];
     }
 
@@ -100,7 +99,7 @@ class Kernel
         AVAILABLE COMMANDS\n
         COMMON;
         $keys = array_keys($this->commands);
-        foreach($keys as $key){
+        foreach ($keys as $key) {
             echo "\t-> {$key}\n";
         }
     }

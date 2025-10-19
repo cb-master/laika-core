@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Laika PHP MVC Framework
  * Author: Showket Ahmed
@@ -11,12 +12,12 @@
 declare(strict_types=1);
 
 // Namespace
-namespace CBM\Core\Console\Commands\View;
+namespace Laika\Core\Console\Commands\View;
 
 // Deny Direct Access
 defined('APP_PATH') || http_response_code(403) . die('403 Direct Access Denied!');
 
-use CBM\Core\{Console\Command};
+use Laika\Core\{Console\Command};
 
 class Pop Extends Command
 {
@@ -28,18 +29,18 @@ class Pop Extends Command
 
     /**
      * Run the command to create a new controller.
-     *
      * @param array $params
+     * @return void
      */
     public function run(array $params): void
     {
         // Check Parameters
-        if(count($params) < 1){
+        if (count($params) < 1) {
             $this->error("USAGE: laika pop:view <name>");
             return;
         }
 
-        if(!preg_match($this->exp, $params[0])){
+        if (!preg_match($this->exp, $params[0])) {
             // Invalid Name
             $this->error("Invalid View Name: {$params[0]}");
             return;
@@ -51,10 +52,9 @@ class Pop Extends Command
         // Get Path
         $this->path .= $parts['path'];
 
-
         $file = "{$this->path}/{$parts['name']}.tpl.php";
 
-        if(!is_file($file)){
+        if (!is_file($file)) {
             $this->error("View Doesn't Exist: {$file}");
             return;
         }

@@ -30,7 +30,7 @@ class JsonStorage
 
     public function __construct(?string $path = null)
     {
-        $this->path = $path ?: APP_PATH . '/../lf-storage';
+        $this->path = $path ?: APP_PATH . '/lf-storage';
         if(!realpath($this->path)) {
             throw new RuntimeException("Invalid Json Storage '{$this->path}'");
         }

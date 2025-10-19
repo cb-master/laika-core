@@ -11,7 +11,6 @@
 
 declare(strict_types=1);
 
-// Namespace
 namespace Laika\Core;
 
 class Upload
@@ -154,7 +153,7 @@ class Upload
                     $img->destroy();
                 }
 
-                $results['success'][$name] = ['slug'=>basename($destination), 'path'=>$destination];
+                $results['success'][$name] = ['slug' => basename($destination), 'path'=>$destination];
             } else {
                 $results['errors'][$name] = "Could Not Move Uploaded File!";
             }

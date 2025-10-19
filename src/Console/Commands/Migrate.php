@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Laika PHP MVC Framework
  * Author: Showket Ahmed
@@ -10,20 +11,22 @@
 
 declare(strict_types=1);
 
-// Namespace
-namespace CBM\Core\Console\Commands;
+namespace Laika\Core\Console\Commands;
 
 // Deny Direct Access
 defined('APP_PATH') || http_response_code(403) . die('403 Direct Access Denied!');
 
-use CBM\Core\{Console\Command, Config};
-use CBM\Model\ConnectionManager;
-use CBM\Model\{Schema,DB};
+use Laika\Core\{Console\Command, Config};
+use Laika\Model\ConnectionManager;
+use Laika\Model\{Schema,DB};
 use Exception;
 
 class Migrate Extends Command
 {
-    // Default Options Keys
+    /**
+     * Default Options Keys
+     * @return array<string,string>
+     */
     private function defaulKeys(): array
     {
         return [
@@ -41,8 +44,8 @@ class Migrate Extends Command
 
     /**
      * Run the command to create a new controller.
-     *
      * @param array $params
+     * @return void
      */
     public function run(array $params): void
     {
@@ -68,21 +71,25 @@ class Migrate Extends Command
             
             // Get Old Data if Exist
             $old_data = $db->table('options')->select('opt_key')->get();
-            if(!empty($old_data)){
+            if (!empty($old_data)) {
                 throw new Exception("Database Table 'options' Already Exists. Please Remove Old Table First");
             }
 
             $rows = [];
-            foreach($this->defaulKeys() as $key => $val){
+            foreach ($this->defaulKeys() as $key => $val) {
                 $rows[] = ['opt_key' => $key, 'opt_value'=>$val, 'opt_default'=>'yes'];
             }
             // Insert Options
             $db->table('options')->insertMany($rows);
 
             // Create Secret Config File if Not Exist
-            if(!Config::has('secret')) Config::create('secret', ['key'=>bin2hex(random_bytes(64))]);
+            if (!Config::has('secret')) {
+                Config::create('secret', ['key'=>bin2hex(random_bytes(64))]);
+            }
             // Create Secret Key Value Not Exist or Empty
-            if(!Config::has('secret', 'key')) Config::set('secret', 'key', bin2hex(random_bytes(64)));
+            if (!Config::has('secret', 'key')) {
+                Config::set('secret', 'key', bin2hex(random_bytes(64)));
+            }
             // Success Message
             $this->info("App Migrated Successfully");
         } catch (\Throwable $th) {

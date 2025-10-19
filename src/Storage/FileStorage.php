@@ -110,7 +110,7 @@ class FileStorage
                 ]
             ]);
         } else {
-            $this->path = realpath(APP_PATH . '/../lf-storage');
+            $this->path = realpath(APP_PATH . '/lf-storage');
             Directory::make($this->path);
         }
     }

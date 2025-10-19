@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Laika PHP MVC Framework
  * Author: Showket Ahmed
@@ -10,20 +11,19 @@
 
 declare(strict_types=1);
 
-// Namespace
-namespace CBM\Core\Console\Commands;
+namespace Laika\Core\Console\Commands;
 
 // Deny Direct Access
 defined('APP_PATH') || http_response_code(403) . die('403 Direct Access Denied!');
 
-use CBM\Core\Console\Command;
+use Laika\Core\Console\Command;
 
 class ListCommands Extends Command
 {
     /**
      * Run the command to create a new controller.
-     *
      * @param array $params
+     * @return void
      */
     public function run(array $params): void
     {
@@ -67,15 +67,6 @@ class ListCommands Extends Command
             Delete  :   php laika pop:view <name>
             List    :   php laika list:view <sub_path::optional>\n\n
         VIEW;
-
-        // TEMPLATE ENGINE VIEW
-        echo <<<TPL
-        ## TEMPLATE ENGINE VIEW
-            Make    :   php laika make:template <name>
-            Rename  :   php laika rename:template <old_name> <new_name>
-            Delete  :   php laika pop:template <name>
-            List    :   php laika list:template <sub_path::optional>\n\n
-        TPL;
 
         // SECRET
         echo <<<SECRET

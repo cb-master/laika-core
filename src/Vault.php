@@ -11,7 +11,6 @@
 
 declare(strict_types=1);
 
-// Namespace
 namespace Laika\Core;
 
 // Deny Direct Access
@@ -74,7 +73,7 @@ class Vault
         $encrypted = openssl_encrypt($text, $this->cipher, $this->key, OPENSSL_RAW_DATA, $iv, $tag, '', $this->tagLength);
 
         // Store IV + Encrypted Data Together (Base64 Encoded)
-        if($encrypted) {
+        if ($encrypted) {
             return base64_encode($iv . $tag . $encrypted);
         }
         return false;
