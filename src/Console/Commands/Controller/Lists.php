@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Laika PHP MVC Framework
  * Author: Showket Ahmed
@@ -10,13 +11,12 @@
 
 declare(strict_types=1);
 
-// Namespace
-namespace CBM\Core\Console\Commands\Controller;
+namespace Laika\Core\Console\Commands\Controller;
 
 // Deny Direct Access
 defined('APP_PATH') || http_response_code(403) . die('403 Direct Access Denied!');
 
-use CBM\Core\{Console\Command, Directory};
+use Laika\Core\{Console\Command, Directory};
 
 // Make Controller Class
 class Lists Extends Command
@@ -29,6 +29,7 @@ class Lists Extends Command
 
     /**
      * @param array $params
+     * @return void
      */
     public function run(array $params): void
     {
@@ -36,25 +37,29 @@ class Lists Extends Command
         $path = trim($params[0] ?? '', '/');
 
         // Check View Name is Valid
-        if($path && !preg_match($this->exp, $path)){
+        if ($path && !preg_match($this->exp, $path)) {
             // Invalid View Name
             $this->error("Invalid View Path: '{$path}'");
             return;
         }
 
         // Get Path if Given
-        if($path) $this->path .= "/{$path}";
+        if ($path) {
+            $this->path .= "/{$path}";
+        }
 
         // Check Path Exist
-        if(!Directory::exists($this->path)){
+        if (!Directory::exists($this->path)) {
             $this->error("View Path Not Found: '{$this->path}'");
             return;
         }
 
         $paths = Directory::scanRecursive($this->path, true, 'php');
         $items = [];
-        foreach($paths as $file){
-            if(is_file($file)) $items[] = 'CBM\\App\\Controller\\'.str_replace(["{$this->path}/", '.php','/'], ['','','\\'], $file);
+        foreach ($paths as $file) {
+            if (is_file($file)) {
+                $items[] = 'Laika\\App\\Controller\\'.str_replace(["{$this->path}/", '.php','/'], ['','','\\'], $file);
+            }
         }
 
         // Header

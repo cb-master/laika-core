@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Laika PHP MVC Framework
  * Author: Showket Ahmed
@@ -11,12 +12,12 @@
 declare(strict_types=1);
 
 // Namespace
-namespace CBM\Core\Console\Commands\View;
+namespace Laika\Core\Console\Commands\View;
 
 // Deny Direct Access
 defined('APP_PATH') || http_response_code(403) . die('403 Direct Access Denied!');
 
-use CBM\Core\{Console\Command,Directory};
+use Laika\Core\{Console\Command,Directory};
 
 class Make Extends Command
 {
@@ -30,16 +31,17 @@ class Make Extends Command
      * Run the command to create a new controller.
      *
      * @param array $params
+     * @return void
      */
     public function run(array $params): void
     {
         // Check Parameters
-        if(count($params) < 1){
+        if (count($params) < 1) {
             $this->error("USAGE: laika make:view <name>");
             return;
         }
 
-        if(!preg_match($this->exp, $params[0])){
+        if (!preg_match($this->exp, $params[0])) {
             // Invalid Name
             $this->error("Invalid View Name: '{$params[0]}'");
             return;
@@ -47,15 +49,15 @@ class Make Extends Command
         $parts = $this->parts($params[0], false);
 
         $this->path .= $parts['path'];
-        
+
         // Make Directory if Not Exist
-        if(!Directory::exists($this->path)){
+        if (!Directory::exists($this->path)) {
             Directory::make($this->path);
         }
 
         $file = "{$this->path}/{$parts['name']}.tpl.php";
 
-        if(is_file($file)){
+        if (is_file($file)) {
             $this->error("View Already Exist: {$file}");
             return;
         }
@@ -64,9 +66,7 @@ class Make Extends Command
         $content = file_get_contents(__DIR__ . '/../../Samples/View.sample');
 
         // Replace Placeholders
-        // $content = str_replace('{{NAME}}',$parts['name'], $content);
-
-        if(file_put_contents($file, $content) === false){
+        if (file_put_contents($file, $content) === false) {
             $this->error("Failed to Create View: {$file}");
             return;
         }

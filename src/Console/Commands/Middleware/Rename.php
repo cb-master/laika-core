@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Laika PHP MVC Framework
  * Author: Showket Ahmed
@@ -10,13 +11,12 @@
 
 declare(strict_types=1);
 
-// Namespace
-namespace CBM\Core\Console\Commands\Middleware;
+namespace Laika\Core\Console\Commands\Middleware;
 
 // Deny Direct Access
 defined('APP_PATH') || http_response_code(403) . die('403 Direct Access Denied!');
 
-use CBM\Core\{Console\Command, Directory};
+use Laika\Core\{Console\Command, Directory};
 
 // Rename Middleware Class
 class Rename Extends Command
@@ -29,11 +29,12 @@ class Rename Extends Command
 
     /**
      * @param array $params
+     * @return void
      */
     public function run(array $params): void
     {
         // Check Parameters
-        if(count($params) < 2){
+        if (count($params) < 2) {
             $this->error("Usage: laika rename:middleware <old_name> <new_name>");
             return;
         }
@@ -43,13 +44,13 @@ class Rename Extends Command
         $new = $params[1];
 
         // Check Old Middleware Name is Valid
-        if(!preg_match('/^[a-zA-Z_\/]+$/', $old)){
+        if (!preg_match('/^[a-zA-Z_\/]+$/', $old)) {
             // Invalid Middleware Name
             $this->error("Invalid Old Middleware Name: '{$old}'");
             return;
         }
         // Check New Middleware Name is Valid
-        if(!preg_match('/^[a-zA-Z_\/]+$/', $new)){
+        if (!preg_match('/^[a-zA-Z_\/]+$/', $new)) {
             // Invalid Middleware Name
             $this->error("Invalid New Middleware Name: '{$old}'");
             return;
@@ -64,56 +65,57 @@ class Rename Extends Command
         $this->new_path .= $new_parts['path'];
 
          // Old and New Namespace
-        $old_namespace = "namespace CBM\\App\\Middleware{$old_parts['namespace']}";
-        $new_namespace = "namespace CBM\\App\\Middleware{$new_parts['namespace']}";
+        $old_namespace = "namespace Laika\\App\\Middleware{$old_parts['namespace']}";
+        $new_namespace = "namespace Laika\\App\\Middleware{$new_parts['namespace']}";
 
         $old_file = "{$this->old_path}/{$old_parts['name']}.php";
         $new_file = "{$this->new_path}/{$new_parts['name']}.php";
 
         // Check Old Middleware Path is Valid
-        if(!is_file($old_file)){
+        if (!is_file($old_file)) {
             $this->error("Invalid Middleware Name or Path: '$old'");
             return;
         }
 
         // Check New Path Exist
-        if(!Directory::exists($this->new_path)){
+        if (!Directory::exists($this->new_path)) {
             Directory::make($this->new_path);
         }
 
         // Check New Middleware Path is Valid
-        if(is_file($new_file)){
+        if (is_file($new_file)) {
             $this->error("New Middleware Already Exist: '$old'");
             return;
         }
 
         // Get Contents
         $content = file_get_contents($old_file);
-        if($content === false){
+        if ($content === false) {
             $this->error("Failed to Read Middleware: '{$old}'");
             return;
         }
 
         // Replace Namespace if Not Same
-        if($old_namespace != $new_namespace) $content = preg_replace('/'.preg_quote($old_namespace,'/').'/', $new_namespace, $content);
+        if ($old_namespace != $new_namespace) {
+            $content = preg_replace('/'.preg_quote($old_namespace,'/').'/', $new_namespace, $content);
+        }
 
         // Replace Class Name
         $content = preg_replace("/class {$old_parts['name']}/i", "class {$new_parts['name']}", $content);
 
         // Create New Middleware File
-        if(file_put_contents($new_file, $content) === false){
+        if (file_put_contents($new_file, $content) === false) {
             $this->error("Failed to Create Middleware: {$new}");
             return;
         }
 
         // Remove Old Middleware File
 
-        if(!unlink($old_file)){
+        if (!unlink($old_file)) {
             $this->error("Failed to Remove Middleware: '{$old_file}'");
             return;
-        }        
-        
-        
+        }
+
         $this->info("Middleware Renamed Successfully: '{$old}'->'{$new}'");
     }
 }

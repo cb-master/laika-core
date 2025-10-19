@@ -65,9 +65,10 @@ class Token
      */
     public function __construct(?int $expiration = null)
     {
+        $uri = new Uri();
         $this->secret = Config::get('secret', 'key');
-        $this->issuer = Uri::host();
-        $this->audience = Uri::host();
+        $this->issuer = $uri->host();
+        $this->audience = $uri->host();
         $this->expiration = $expiration ?: $this->expiration;
     }
 

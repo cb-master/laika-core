@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Laika PHP MVC Framework
  * Author: Showket Ahmed
@@ -10,13 +11,12 @@
 
 declare(strict_types=1);
 
-// Namespace
-namespace CBM\Core\Console\Commands\Controller;
+namespace Laika\Core\Console\Commands\Controller;
 
 // Deny Direct Access
 defined('APP_PATH') || http_response_code(403) . die('403 Direct Access Denied!');
 
-use CBM\Core\{Console\Command, Directory};
+use Laika\Core\{Console\Command, Directory};
 
 // Make Controller Class
 class Make Extends Command
@@ -35,41 +35,42 @@ class Make Extends Command
 
     /**
      * @param array $params
+     * @return void
      */
     public function run(array $params): void
     {
         // Check Parameters
-        if(count($params) < 1){
+        if (count($params) < 1) {
             $this->error("USAGE: laika make:controller <name> <view::optional>");
             return;
         }
 
         // View Name
-        $view = $params[1] ?? 'default-view';
+        $view = $params[1] ?? 'default';
         
         // Get Controller & View Parts
         $controller_parts   =   $this->parts($params[0]);
         $view_parts         =   $this->parts($view, false);
 
         // Check Controller Name is Valid
-        if(!preg_match($this->exp, $params[0])){
+        if (!preg_match($this->exp, $params[0])) {
             // Invalid Controller Name
             $this->error("Invalid Controller Name: '{$params[0]}'");
             return;
         }
 
         // Check View Name is Valid
-        if(!preg_match($this->view_exp, $view)){
+        if (!preg_match($this->view_exp, $view)) {
             $this->error("Invalid View Name: '{$view}'");
             return;
         }
 
         // Set Controller & View Path
-        $this->path     .=  $controller_parts['path'];
-        $this->view_path.=  $view_parts['path'];
+        $this->path         .=  $controller_parts['path'];
+        $this->view_path    .=  $view_parts['path'];
 
         // Create Controller Directory if Not Exist
-        if(!Directory::exists($this->path)){
+        if (!Directory::exists($this->path)) {
             try {
                 Directory::make($this->path);
             } catch (\Throwable $th) {
@@ -79,7 +80,7 @@ class Make Extends Command
         }
 
         // Create View Directory if Not Exist
-        if(!Directory::exists($this->view_path)){
+        if (!Directory::exists($this->view_path)) {
             try {
                 Directory::make($this->view_path);
             } catch (\Throwable $th) {
@@ -92,7 +93,7 @@ class Make Extends Command
         $view_file          =   "{$this->view_path}/{$view_parts['name']}.tpl.php";
 
         // Check Controller Already Exist
-        if(is_file($controller_file)){
+        if (is_file($controller_file)) {
             $this->error("Controller Already Exist: '{$params[0]}'");
             return;
         }
@@ -111,18 +112,18 @@ class Make Extends Command
             trim($view, '/')
         ], $content);
 
-        if(file_put_contents($controller_file, $content) === false){
+        if (file_put_contents($controller_file, $content) === false) {
             $this->error("Failed to Create Controller: {$controller_file}");
             return;
         }
 
-        if(!is_file($view_file)){
+        if (!is_file($view_file)) {
             // Get Sample View Content
             $content = file_get_contents(__DIR__ . '/../../Samples/View.sample');
             // Replace Placeholders
             $content = str_replace('{{NAME}}', $view, $content);
 
-            if(file_put_contents($view_file, $content) === false){
+            if (file_put_contents($view_file, $content) === false) {
                 $this->error("Failed to Create View: {$view}");
                 return;
             }

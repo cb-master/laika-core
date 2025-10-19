@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Laika PHP MVC Framework
  * Author: Showket Ahmed
@@ -10,13 +11,12 @@
 
 declare(strict_types=1);
 
-// Namespace
-namespace CBM\Core\Console\Commands\Controller;
+namespace Laika\Core\Console\Commands\Controller;
 
 // Deny Direct Access
 defined('APP_PATH') || http_response_code(403) . die('403 Direct Access Denied!');
 
-use CBM\Core\Console\Command;
+use Laika\Core\Console\Command;
 
 // Remove Controller Class
 class Pop Extends Command
@@ -33,13 +33,13 @@ class Pop Extends Command
     public function run(array $params): void
     {
         // Check Parameters
-        if(count($params) < 1){
+        if (count($params) < 1) {
             $this->error("USAGE: laika pop:controller <name>");
             return;
         }
 
         // Check Controller Name is Valid
-        if(!preg_match($this->exp, $params[0])){
+        if (!preg_match($this->exp, $params[0])) {
             // Invalid Controller Name
             $this->error("Invalid Controller Name: '{$params[0]}'");
             return;
@@ -54,12 +54,12 @@ class Pop Extends Command
         $file = "{$this->path}/{$parts['name']}.php";
 
          // Check Controller Path is Valid
-        if(!is_file($file)){
+        if (!is_file($file)) {
             $this->error("Invalid Controller or Path: '{$params[0]}'");
             return;
         }
 
-        if(!unlink($file)){
+        if (!unlink($file)) {
             $this->error("Failed to Remove Controller: '{$file}'");
             return;
         }

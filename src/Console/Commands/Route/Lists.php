@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Laika PHP MVC Framework
  * Author: Showket Ahmed
@@ -10,13 +11,12 @@
 
 declare(strict_types=1);
 
-// Namespace
-namespace CBM\Core\Console\Commands\Route;
+namespace Laika\Core\Console\Commands\Route;
 
 // Deny Direct Access
 defined('APP_PATH') || http_response_code(403) . die('403 Direct Access Denied!');
 
-use CBM\Core\{Console\Command, App\Http};
+use Laika\Core\{Console\Command, App\Router};
 
 // Make Controller Class
 class Lists Extends Command
@@ -24,11 +24,9 @@ class Lists Extends Command
     // App Controller Path
     protected string $path = APP_PATH . '/lf-routes';
 
-    // Accepted Regular Expresion
-    private string $exp = '/^[a-zA-Z_\/]+$/';
-
     /**
      * @param array $params
+     * @return void
      */
     public function run(array $params): void
     {
@@ -38,7 +36,7 @@ class Lists Extends Command
         -------------------------------------------------------------------\n
         PHP;
         // Get Http List
-        Http::inspectAll();
+        Router::inspectAll();
         return;
     }
 }

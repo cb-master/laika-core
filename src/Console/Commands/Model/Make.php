@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Laika PHP MVC Framework
  * Author: Showket Ahmed
@@ -10,13 +11,12 @@
 
 declare(strict_types=1);
 
-// Namespace
-namespace CBM\Core\Console\Commands\Model;
+namespace Laika\Core\Console\Commands\Model;
 
 // Deny Direct Access
 defined('APP_PATH') || http_response_code(403) . die('403 Direct Access Denied!');
 
-use CBM\Core\{Console\Command,Directory};
+use Laika\Core\{Console\Command,Directory};
 
 class Make Extends Command
 {
@@ -28,11 +28,12 @@ class Make Extends Command
 
     /**
      * @param array $params
+     * @return void
      */
     public function run(array $params): void
     {
         // Check Parameters
-        if(count($params) < 1){
+        if (count($params) < 1) {
             $this->error("USAGE: laika make:model <name> <table::optional> <id::optional>");
             return;
         }
@@ -43,7 +44,7 @@ class Make Extends Command
         // Primary Key Name
         $id = $params[2] ?? 'id';
 
-        if(!preg_match($this->exp, $params[0])){
+        if (!preg_match($this->exp, $params[0])) {
             // Invalid Name
             $this->error("Invalid Model Name: '{$params[0]}'");
             return;
@@ -53,13 +54,13 @@ class Make Extends Command
         $this->path .= $parts['path'];
         
         // Make Directory if Not Exist
-        if(!Directory::exists($this->path)){
+        if (!Directory::exists($this->path)) {
             Directory::make($this->path);
         }
 
         $file = "{$this->path}/{$parts['name']}.php";
 
-        if(is_file($file)){
+        if (is_file($file)) {
             $this->error("Model Already Exist: {$file}");
             return;
         }
@@ -80,7 +81,7 @@ class Make Extends Command
             $id
         ], $content);
 
-        if(file_put_contents($file, $content) === false){
+        if (file_put_contents($file, $content) === false) {
             $this->error("Failed to Create Model: {$file}");
             return;
         }

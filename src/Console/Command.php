@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Laika PHP MVC Framework
  * Author: Showket Ahmed
@@ -10,8 +11,7 @@
 
 declare(strict_types=1);
 
-// Namespace
-namespace CBM\Core\Console;
+namespace laika\Core\Console;
 
 // Deny Direct Access
 defined('APP_PATH') || http_response_code(403).die('403 Direct Access Denied!');
@@ -23,12 +23,14 @@ abstract class Command
      * @param array $params
      * This method should be implemented by each command class to define its behavior.
      * It should accept an array of parameters that can be passed from the command line.
+     * @return void
      */
     abstract public function run(array $params): void;
 
     /**
      * @param string $message
      * This method is used to print informational messages to the console.
+     * @return void
      */
     protected function info(string $message): void
     {
@@ -39,6 +41,7 @@ abstract class Command
     /**
      * @param string $message
      * This method is used to print informational messages to the console.
+     * @return void
      */
     protected function error(string $message): void
     {
@@ -50,26 +53,26 @@ abstract class Command
      * @param string $str. Directory Path Stringl. Example: 'Admin/User'
      * @param bool $ucfirst. First Character of All Folders Will Be Upper Case. Default is true
      * @return array results with keys 'name', 'path', 'namespace'
+     * @return array{name:string,path:string,namespace:string}
      */
     protected function parts(string $str, bool $ucfirst = true): array
     {
-        $str = trim($str, '/');
-        $parts = explode('/', $str);
+        $str    =   trim($str, '/');
+        $parts  =   explode('/', $str);
 
         // Get File Name
-        $result['name']     =   array_pop($parts);
-        $result['path']     =   '';
-        $result['namespace']=   '';
+        $result['name']         =   array_pop($parts);
+        $result['path']         =   '';
+        $result['namespace']    =   '';
 
         // $parts = array_map('ucfirst', $parts);
         foreach($parts as $part){
             // Ucfirst if true
             if($ucfirst) $part = ucfirst($part);
 
-            $result['path']     .=   "/{$part}";
-            $result['namespace'].=   "\\{$part}";
+            $result['path']         .=   "/{$part}";
+            $result['namespace']    .=   "\\{$part}";
         }
-
         return $result;
     }
 }

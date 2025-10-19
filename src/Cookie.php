@@ -32,11 +32,12 @@ class Cookie
         } else {
             $value = (string) $value;
         }
+        $uri = new Uri();
         return setcookie($name, rawurlencode($value), [
             'expires'  => time() + $expires,
             'path'     => $path,
-            'domain'   => Uri::host(),
-            'secure'   => Uri::isHttps(),
+            'domain'   => $uri->host(),
+            'secure'   => $uri->isHttps(),
             'httponly' => true,
             'samesite' => 'Strict'
         ]);
@@ -75,11 +76,12 @@ class Cookie
     public static function pop(string $name, string $path = '/'): bool
     {
         if (isset($_COOKIE[$name])) {
+            $uri = new Uri();
             setcookie($name, '', [
                 'expires'  => time() - 3600,
                 'path'     => $path,
-                'domain'   => Uri::host(),
-                'secure'   => Uri::isHttps(),
+                'domain'   => $uri->host(),
+                'secure'   => $uri->isHttps(),
                 'httponly' => true,
                 'samesite' => 'Strict'
             ]);
