@@ -156,7 +156,9 @@ class Auth
 
         $obj->user = json_decode($row['data'], true);
 
-        if (($row['expire'] - $obj->time) < ($obj->ttl / 2)) self::regenerate();
+        if (($row['expire'] - $obj->time) < ($obj->ttl / 2)) {
+            self::regenerate();
+        }
 
         return $obj->user;
     }

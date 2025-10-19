@@ -11,7 +11,6 @@
 
 declare(strict_types=1);
 
-// Namespace
 namespace Laika\Core\Console\Commands\Controller;
 
 // Deny Direct Access

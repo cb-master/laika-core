@@ -44,7 +44,9 @@ class Lists extends Command
         }
 
         // Get Path if Given
-        if ($path) $this->path .= "/{$path}";
+        if ($path) {
+            $this->path .= "/{$path}";
+        }
 
         // Check Path Exist
         if (!Directory::exists($this->path)) {

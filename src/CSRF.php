@@ -67,7 +67,9 @@ class CSRF
     public function get(): string
     {
         $csrf = Session::get($this->key, $this->for);
-        if (!isset($csrf['token']) || !$csrf['token']) return $this->reset();
+        if (!isset($csrf['token']) || !$csrf['token']) {
+            return $this->reset();
+        }
         return $csrf['token'];
     }
 

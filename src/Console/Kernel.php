@@ -34,8 +34,12 @@ class Kernel
         // Register Commands
         $this->registerCommands();
     }
-    
-    public function handle()
+
+    /**
+     * Handle Kernel
+     * @return void
+     */
+    public function handle(): void
     {
         // Remove "laika"
         array_shift($this->args);
@@ -46,7 +50,6 @@ class Kernel
 
         if ($command && isset($this->commands[strtolower($command)])) {
             $class = $this->commands[strtolower($command)];
-            
             call_user_func([new $class(), 'run'], $params);
         } else {
             $this->printHelp();

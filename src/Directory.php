@@ -140,7 +140,7 @@ class Directory
 
         // Normalize extension filter
         $extList = is_array($ext) ? array_map('strtolower', $ext) : [$ext];
-        $extList = array_map(fn($e) => ltrim($e, '.'), $extList);
+        $extList = array_map(fn ($e) => ltrim($e, '.'), $extList);
 
         foreach ($iterator as $item) {
             if ($item->isDir()) {

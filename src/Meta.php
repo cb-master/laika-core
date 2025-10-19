@@ -30,7 +30,7 @@ class Meta
     */
    public static function version(string $path): array
    {
-      if (!is_dir($path)) {
+      if (!is_file($path)) {
          throw new InvalidArgumentException("Invalid Path: $path");
       }
       $meta = [];

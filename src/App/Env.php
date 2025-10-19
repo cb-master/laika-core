@@ -11,11 +11,10 @@
 
 declare(strict_types=1);
 
-// Namespace
 namespace Laika\Core\App;
 
 // Deny Direct Access
-defined('APP_PATH') || http_response_code(403).die('403 Direct Access Denied!');
+defined('APP_PATH') || http_response_code(403) . die('403 Direct Access Denied!');
 
 // Application Environments
 class Env
@@ -30,7 +29,10 @@ class Env
     private array $params = [];
 
     // Singleton Process
-    private function __construct(){} // Prevent Making New Instance
+    private function __construct()
+    {
+        // Prevent Making New Instance
+    }
 
     // Get Instance
     private static function getInstance()
@@ -48,7 +50,7 @@ class Env
     public static function set(string $key, mixed $value): void
     {
         $instance = self::getInstance();
-        $keys = array_filter(explode('|', $key), fn($k) => $k !== '');
+        $keys = array_filter(explode('|', $key), fn ($k) => $k !== '');
 
         $ref = &$instance->params;
         foreach ($keys as $k) {
@@ -70,7 +72,7 @@ class Env
     public static function get(string $key, mixed $default = null): mixed
     {
         $instance = self::getInstance();
-        $keys = array_filter(explode('|', $key), fn($k) => $k !== '');
+        $keys = array_filter(explode('|', $key), fn ($k) => $k !== '');
 
         $ref = $instance->params;
         foreach ($keys as $k) {

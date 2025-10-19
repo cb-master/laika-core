@@ -188,7 +188,7 @@ class FileStorage
 
     /**
      * Uploaded File Path
-     * @return string 
+     * @return string
      */
     public function path(): string
     {

@@ -16,7 +16,7 @@ namespace Laika\Core\Console\Commands\View;
 // Deny Direct Access
 defined('APP_PATH') || http_response_code(403) . die('403 Direct Access Denied!');
 
-use Laika\Core\{Console\Command,Directory};
+use Laika\Core\{Console\Command, Directory};
 
 class Make extends Command
 {

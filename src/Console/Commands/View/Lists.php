@@ -19,7 +19,7 @@ defined('APP_PATH') || http_response_code(403) . die('403 Direct Access Denied!'
 use Laika\Core\{Console\Command, Directory};
 
 // Make View Class
-class Lists Extends Command
+class Lists extends Command
 {
     // App View Path
     protected string $path = APP_PATH . '/lf-templates';
@@ -84,7 +84,7 @@ class Lists Extends Command
         foreach ($items as $item) {
             $item = str_replace(["{$this->path}/", '.tpl.php'], [''], $item);
             printf("| %-3d | %-{$col2Width}s |\n", $count, $item);
-            $count ++;
+            $count++;
         }
 
         echo $line;
