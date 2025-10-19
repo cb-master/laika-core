@@ -5,8 +5,6 @@ Laika PHP Framework Core
 
 ## PHP Compatibility
 
-## 🧩 PHP Compatibility Matrix
-
 | PHP Version | Status | Notes |
 |--------------|--------|-------|
 | **8.1** | ✅ | Stable & fully tested |
