@@ -23,6 +23,7 @@ jobs:
     runs-on: ubuntu-latest
 
     strategy:
+      fail-fast: false
       matrix:
         php-version: ['8.1','8.2','8.3','8.4']
 
@@ -62,6 +63,20 @@ jobs:
 
       - name: Run Test Suite
         run: composer test
+
+      - name: Initialize PHP compatibility table
+        if: ${{ matrix.php-version == '8.1' }}
+        run: |
+          echo "| PHP Version | Compatibility |" >> $GITHUB_STEP_SUMMARY
+          echo "|--------------|---------------|" >> $GITHUB_STEP_SUMMARY
+
+      - name: Append PHP compatibility result
+        if: success()
+        run: echo "| PHP ${{ matrix.php-version }} | ✅ |" >> $GITHUB_STEP_SUMMARY
+
+      - name: Append PHP compatibility result (failed)
+        if: failure()
+        run: echo "| PHP ${{ matrix.php-version }} | ❌ |" >> $GITHUB_STEP_SUMMARY
 
   ########################################################
   # 2/ STATIC ANALYSIS & LINTING
@@ -178,6 +193,9 @@ jobs:
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
+          draft: false
+          prerelease: ${{ env.CHANNEL == 'beta' && true || false }}
+          overwrite: true
           tag_name: ${{ github.ref_name }}
           name: "${{ env.CHANNEL == 'beta' && 'BETA' || 'STABLE' }} - ${{ github.ref_name }}"
           body: |
