@@ -18,7 +18,7 @@ defined('APP_PATH') || http_response_code(403) . die('403 Direct Access Denied!'
 
 use Laika\Core\Console\Command;
 
-class Pop Extends Command
+class Pop extends Command
 {
     // App Model Path
     protected string $path = APP_PATH . '/lf-app/Model';

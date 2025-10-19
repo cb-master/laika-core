@@ -11,7 +11,6 @@
 
 declare(strict_types=1);
 
-// Namespace
 namespace Laika\Core\Console\Commands\Model;
 
 // Deny Direct Access
@@ -20,11 +19,11 @@ defined('APP_PATH') || http_response_code(403) . die('403 Direct Access Denied!'
 use Laika\Core\{Console\Command, Directory};
 
 // Rename Model Class
-class Rename Extends Command
+class Rename extends Command
 {
     // App Model Old Path
     protected string $old_path = APP_PATH . '/lf-app/Model';
-    
+
     // App Model New Path
     protected string $new_path = APP_PATH . '/lf-app/Model';
 
@@ -68,7 +67,7 @@ class Rename Extends Command
         $this->old_path .= $old_parts['path'];
         $this->new_path .= $new_parts['path'];
 
-         // Old and New Namespace
+        // Old and New Namespace
         $old_namespace = "namespace Laika\\App\\Model{$old_parts['namespace']}";
         $new_namespace = "namespace Laika\\App\\Model{$new_parts['namespace']}";
 
@@ -101,7 +100,7 @@ class Rename Extends Command
 
         // Replace Namespace if Not Same
         if ($old_namespace != $new_namespace) {
-            $content = preg_replace('/'.preg_quote($old_namespace,'/').'/', $new_namespace, $content);
+            $content = preg_replace('/' . preg_quote($old_namespace, '/') . '/', $new_namespace, $content);
         }
 
         // Replace Class Name
@@ -118,7 +117,7 @@ class Rename Extends Command
             $this->error("Failed to Remove Model: '{$old_file}'");
             return;
         }
-        
+
         $this->info("Model Renamed Successfully: '{$old}'->'{$new}'");
         return;
     }

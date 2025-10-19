@@ -19,7 +19,7 @@ defined('APP_PATH') || http_response_code(403) . die('403 Direct Access Denied!'
 use Laika\Core\{Console\Command, Directory};
 
 // Make Middleware Class
-class Make Extends Command
+class Make extends Command
 {
     // App Middleware Path
     protected string $path = APP_PATH . '/lf-app/Middleware';

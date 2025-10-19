@@ -57,13 +57,15 @@ class Router
      */
     public static function url(string $name, array $params = [], bool $absolute = false): string
     {
-        if (!isset(self::$namedRoutes[$name])) return '';
+        if (!isset(self::$namedRoutes[$name])) {
+            return '';
+        }
 
         $uri = self::$namedRoutes[$name][1];
 
         // Replace {param} placeholders
         foreach ($params as $key => $value) {
-            $uri = preg_replace('/\{'.$key.'(:[^}]*)?\}/', (string) $value, $uri);
+            $uri = preg_replace('/\{' . $key . '(:[^}]*)?\}/', (string) $value, $uri);
         }
 
         // Remove unreplaced params
@@ -73,7 +75,7 @@ class Router
         $uri = '/' . trim($uri, '/');
 
         $obj = new Uri();
-        return $absolute ? $obj->base().trim($uri, '/') : $uri;
+        return $absolute ? $obj->base() . trim($uri, '/') : $uri;
     }
 
     /**
@@ -89,7 +91,7 @@ class Router
         // track last registered route
         self::$lastMethod = 'GET';
         self::$lastUri    = $slug;
-        return new self;
+        return new self();
     }
 
     /**
@@ -105,7 +107,7 @@ class Router
         // track last registered route
         self::$lastMethod = 'POST';
         self::$lastUri    = $slug;
-        return new self;
+        return new self();
     }
 
     /**
@@ -121,7 +123,7 @@ class Router
         // track last registered route
         self::$lastMethod = 'PUT';
         self::$lastUri    = $slug;
-        return new self;
+        return new self();
     }
 
     /**
@@ -137,7 +139,7 @@ class Router
         // track last registered route
         self::$lastMethod = 'PATCH';
         self::$lastUri    = $slug;
-        return new self;
+        return new self();
     }
 
     /**
@@ -153,7 +155,7 @@ class Router
         // track last registered route
         self::$lastMethod = 'DELETE';
         self::$lastUri    = $slug;
-        return new self;
+        return new self();
     }
 
     /**
@@ -169,7 +171,7 @@ class Router
         // track last registered route
         self::$lastMethod = 'OPTIONS';
         self::$lastUri    = $slug;
-        return new self;
+        return new self();
     }
 
     /**
@@ -185,7 +187,7 @@ class Router
         // track last registered route
         self::$lastMethod = 'HEAD';
         self::$lastUri    = $slug;
-        return new self;
+        return new self();
     }
 
     /**
@@ -210,13 +212,13 @@ class Router
         );
 
         // call user callback (allows Http::get() calls inside)
-        $callback(new self);
+        $callback(new self());
 
         // Pop prefix & restore middlewares
         array_pop(self::$groupStack);
         self::$groupMiddlewares = $previousMiddlewares;
 
-        return new self;
+        return new self();
     }
 
     /**
@@ -228,7 +230,7 @@ class Router
     public static function middlewareGroup(string $name, array $middlewares): self
     {
         self::$middlewareGroups[$name] = $middlewares;
-        return new self;
+        return new self();
     }
 
     /**
@@ -238,7 +240,9 @@ class Router
      */
     public function middleware(array|string $middlewares): self
     {
-        if (!is_array($middlewares)) $middlewares = [$middlewares];
+        if (!is_array($middlewares)) {
+            $middlewares = [$middlewares];
+        }
         if (self::$lastMethod && self::$lastUri) {
             self::$routes[self::$lastMethod][self::$lastUri]['middlewares'] =
                 array_merge(self::$routes[self::$lastMethod][self::$lastUri]['middlewares'], $middlewares);
@@ -253,7 +257,9 @@ class Router
      */
     public function afterware(array|string $middlewares): self
     {
-        if (!is_array($middlewares)) $middlewares = [$middlewares];
+        if (!is_array($middlewares)) {
+            $middlewares = [$middlewares];
+        }
         if (self::$lastMethod && self::$lastUri) {
             self::$routes[self::$lastMethod][self::$lastUri]['afterwares'] =
                 array_merge(self::$routes[self::$lastMethod][self::$lastUri]['afterwares'], $middlewares);
@@ -274,7 +280,7 @@ class Router
                 self::$globalBefore[] = ['name' => $expanded, 'priority' => $priority];
             }
         }
-        return new self;
+        return new self();
     }
 
     /**
@@ -290,7 +296,7 @@ class Router
                 self::$globalAfter[] = ['name' => $expanded, 'priority' => $priority];
             }
         }
-        return new self;
+        return new self();
     }
 
     /**
@@ -301,7 +307,7 @@ class Router
     public static function fallback(callable|array|string $callback): self
     {
         self::$fallback = $callback;
-        return new self;
+        return new self();
     }
 
     /**
@@ -315,7 +321,7 @@ class Router
             $prefix = implode('', self::$groupStack);
             self::$groupFallbacks[$prefix] = $callback;
         }
-        return new self;
+        return new self();
     }
 
     ########################################################
@@ -329,7 +335,9 @@ class Router
         $path = self::normalize('/' . $obj->path());
 
         // Fallback If Http Method Doesn't Exists
-        if (!isset(self::$routes[$method])) goto fallback;
+        if (!isset(self::$routes[$method])) {
+            goto fallback;
+        }
 
         foreach (self::$routes[$method] as $route => $data) {
             $pattern = preg_replace_callback(
@@ -348,8 +356,8 @@ class Router
                 $matches = array_filter($matches, 'is_string', ARRAY_FILTER_USE_KEY);
 
                 // Sort global before/after
-                usort(self::$globalBefore, fn($a, $b) => $a['priority'] <=> $b['priority']);
-                usort(self::$globalAfter, fn($a, $b) => $a['priority'] <=> $b['priority']);
+                usort(self::$globalBefore, fn ($a, $b) => $a['priority'] <=> $b['priority']);
+                usort(self::$globalAfter, fn ($a, $b) => $a['priority'] <=> $b['priority']);
                 $before = array_column(self::$globalBefore, 'name');
                 $after  = array_column(self::$globalAfter, 'name');
 
@@ -373,7 +381,7 @@ class Router
 
                         if (method_exists($instance, 'handle')) {
                             // next closure — when called, it advances the pipeline and merges context
-                            $next = function(array $nextContext = []) use (&$runner, $index, $context) {
+                            $next = function (array $nextContext = []) use (&$runner, $index, $context) {
                                 return $runner($index + 1, array_merge($context, $nextContext));
                             };
 
@@ -477,7 +485,7 @@ class Router
         }
 
         http_response_code(404);
-        require_once __DIR__.'/404.php';
+        require_once __DIR__ . '/404.php';
     }
 
     #######################################################
@@ -518,8 +526,8 @@ class Router
 
             if (preg_match($pattern, $path)) {
                 // Sort global middleware
-                usort(self::$globalBefore, fn($a, $b) => $a['priority'] <=> $b['priority']);
-                usort(self::$globalAfter, fn($a, $b) => $a['priority'] <=> $b['priority']);
+                usort(self::$globalBefore, fn ($a, $b) => $a['priority'] <=> $b['priority']);
+                usort(self::$globalAfter, fn ($a, $b) => $a['priority'] <=> $b['priority']);
 
                 $before = array_column(self::$globalBefore, 'name');
                 $after  = array_column(self::$globalAfter, 'name');
@@ -629,7 +637,7 @@ class Router
 
     /**
      * Execute Callback
-     * @param callable|array|string $callback Example: HomeController@index or ['HomeController','index'] or Anonimous function 
+     * @param callable|array|string $callback Example: HomeController@index or ['HomeController','index'] or Anonimous function
      * @param array ...$params Parameters from Slug & Middlewares
      */
     protected static function executeCallback(callable|string $callback, array $params)
@@ -701,7 +709,7 @@ class Router
         $name = $parts[0];
 
         $extra = isset($parts[1]) ? explode(',', $parts[1]) : [];
-        foreach($extra as $param){
+        foreach ($extra as $param) {
             $internal_params = explode(':', $param);
             $matches[$internal_params[0]] = $internal_params[1] ?? null;
         }
@@ -743,8 +751,8 @@ class Router
     private static function buildPipeline(array $data): array
     {
         // Sort global middleware
-        usort(self::$globalBefore, fn($a, $b) => $a['priority'] <=> $b['priority']);
-        usort(self::$globalAfter, fn($a, $b) => $a['priority'] <=> $b['priority']);
+        usort(self::$globalBefore, fn ($a, $b) => $a['priority'] <=> $b['priority']);
+        usort(self::$globalAfter, fn ($a, $b) => $a['priority'] <=> $b['priority']);
 
         $before = array_column(self::$globalBefore, 'name');
         $after  = array_column(self::$globalAfter, 'name');

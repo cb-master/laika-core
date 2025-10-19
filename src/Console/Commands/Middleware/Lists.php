@@ -19,7 +19,7 @@ defined('APP_PATH') || http_response_code(403) . die('403 Direct Access Denied!'
 use Laika\Core\{Console\Command, Directory};
 
 // Make Middleware Class
-class Lists Extends Command
+class Lists extends Command
 {
     // App Middleware Path
     protected string $path = APP_PATH . '/lf-app/Middleware';
@@ -58,13 +58,13 @@ class Lists Extends Command
         $items = [];
         foreach ($paths as $file) {
             if (is_file($file)) {
-                $items[] = 'Laika\\App\\Middleware\\'.str_replace(["{$this->path}/", '.php','/'], ['','','\\'], $file);
+                $items[] = 'Laika\\App\\Middleware\\' . str_replace(["{$this->path}/", '.php', '/'], ['', '', '\\'], $file);
             }
         }
 
         // Header
         $headers = ['#', 'Templates'];
-        
+
         // Find max width for "File Path" column
         $maxLength = max(array_map('strlen', $items));
         $col2Width = max(strlen($headers[1]), $maxLength);
@@ -82,7 +82,7 @@ class Lists Extends Command
         foreach ($items as $item) {
             $item = str_replace(["{$this->path}/", '.tpl.php'], [''], $item);
             printf("| %-3d | %-{$col2Width}s |\n", $count, $item);
-            $count ++;
+            $count++;
         }
 
         echo $line;

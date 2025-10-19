@@ -11,11 +11,10 @@
 
 declare(strict_types=1);
 
-// Namespace
 namespace Laika\Core\Http;
 
 // Deny Direct Access
-defined('APP_PATH') || http_response_code(403).die('403 Direct Access Denied!');
+defined('APP_PATH') || http_response_code(403) . die('403 Direct Access Denied!');
 
 class Request
 {
@@ -225,7 +224,7 @@ class Request
      */
     public function hasBlankInput(array $keys): bool
     {
-        foreach($keys as $key){
+        foreach ($keys as $key) {
             $value = self::input($key);
             if ($value === null || $value === '') {
                 return true;

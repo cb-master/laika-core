@@ -13,6 +13,9 @@ declare(strict_types=1);
 
 namespace Laika\Core;
 
+// Deny Direct Access
+defined('APP_PATH') || http_response_code(403) . die('403 Direct Access Denied!');
+
 class Upload
 {
     // Fields
@@ -153,7 +156,7 @@ class Upload
                     $img->destroy();
                 }
 
-                $results['success'][$name] = ['slug' => basename($destination), 'path'=>$destination];
+                $results['success'][$name] = ['slug' => basename($destination), 'path' => $destination];
             } else {
                 $results['errors'][$name] = "Could Not Move Uploaded File!";
             }

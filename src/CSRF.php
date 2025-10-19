@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace Laika\Core;
 
 // Deny Direct Access
-defined('APP_PATH') || http_response_code(403).die('403 Direct Access Denied!');
+defined('APP_PATH') || http_response_code(403) . die('403 Direct Access Denied!');
 
 use Laika\Core\Http\Request;
 use Laika\Session\Session;
@@ -49,12 +49,12 @@ class CSRF
     {
         $csrf = Session::get($this->key, $this->for);
         // Generate CSRF Token if Not Exists
-        if(
+        if (
             !isset($csrf['created'], $csrf['token']) ||
             !$csrf['created'] ||
             !$csrf['token'] ||
             ((int) option('start.time', 300) - $csrf['created'] > $this->lifetime)
-        ){
+        ) {
             return $this->reset();
         }
         return $csrf['token'];
@@ -67,7 +67,9 @@ class CSRF
     public function get(): string
     {
         $csrf = Session::get($this->key, $this->for);
-        if (!isset($csrf['token']) || !$csrf['token']) return $this->reset();
+        if (!isset($csrf['token']) || !$csrf['token']) {
+            return $this->reset();
+        }
         return $csrf['token'];
     }
 
@@ -78,8 +80,8 @@ class CSRF
     public function reset(): string
     {
         $arr = [
-                'created'   =>  (int) option('start.time', 300),
-                'token'     =>  bin2hex(random_bytes(64))
+            'created'   =>  (int) option('start.time', 300),
+            'token'     =>  bin2hex(random_bytes(64))
         ];
         Session::set($this->key, $arr, $this->for);
         return $arr['token'];

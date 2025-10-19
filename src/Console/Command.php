@@ -66,9 +66,11 @@ abstract class Command
         $result['namespace']    =   '';
 
         // $parts = array_map('ucfirst', $parts);
-        foreach($parts as $part){
+        foreach ($parts as $part) {
             // Ucfirst if true
-            if($ucfirst) $part = ucfirst($part);
+            if ($ucfirst) {
+                $part = ucfirst($part);
+            }
 
             $result['path']         .=   "/{$part}";
             $result['namespace']    .=   "\\{$part}";

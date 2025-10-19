@@ -11,8 +11,10 @@
 
 declare(strict_types=1);
 
-// Namespace
 namespace Laika\Core;
+
+// Deny Direct Access
+defined('APP_PATH') || http_response_code(403) . die('403 Direct Access Denied!');
 
 use InvalidArgumentException;
 use ZipArchive;
@@ -33,11 +35,11 @@ class Zip
         $dir = dirname($path);
 
         // Check Valid File if File Exists
-        if(file_exists($path) && !is_file($path)) {
+        if (file_exists($path) && !is_file($path)) {
             throw new InvalidArgumentException("Path '{$path}' is not a valid file!");
         }
 
-        if(!is_dir($dir) || !is_writable($dir)) {
+        if (!is_dir($dir) || !is_writable($dir)) {
             throw new InvalidArgumentException("Directory '{$dir}' is not writable!");
         }
 
@@ -67,7 +69,9 @@ class Zip
 
         foreach ($files as $file) {
             // Throw Exception if File Doesn't Exists
-            if(!file_exists($file)) throw new InvalidArgumentException("Invalid Path '{$file}' Detected!");
+            if (!file_exists($file)) {
+                throw new InvalidArgumentException("Invalid Path '{$file}' Detected!");
+            }
 
             $localName = $baseDir ? substr($file, strlen($baseDir) + 1) : basename($file);
 
@@ -88,7 +92,7 @@ class Zip
      */
     public function extract(string $to): bool
     {
-        if(!Directory::make($to)){
+        if (!Directory::make($to)) {
             throw new InvalidArgumentException("Unable to create extract directory '{$to}'!");
         }
 

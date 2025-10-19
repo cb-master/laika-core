@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Laika\Core\Http;
 
-defined('APP_PATH') || http_response_code(403).die('403 Direct Access Denied!');
+defined('APP_PATH') || http_response_code(403) . die('403 Direct Access Denied!');
 
 class Validator
 {
@@ -112,7 +112,7 @@ class Validator
                             $errors[$field][] = "Invalid regex pattern for {$field}.";
                         }
                         break;
-                    
+
                     case 'callback':
                         $callbackName = $params[0] ?? null;
                         if ($callbackName) {

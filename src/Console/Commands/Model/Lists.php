@@ -19,7 +19,7 @@ defined('APP_PATH') || http_response_code(403) . die('403 Direct Access Denied!'
 use Laika\Core\{Console\Command, Directory};
 
 // Make Model Class
-class Lists Extends Command
+class Lists extends Command
 {
     // App Model Path
     protected string $path = APP_PATH . '/lf-app/Model';
@@ -44,7 +44,9 @@ class Lists Extends Command
         }
 
         // Get Path if Given
-        if ($path) $this->path .= "/{$path}";
+        if ($path) {
+            $this->path .= "/{$path}";
+        }
 
         // Check Path Exist
         if (!Directory::exists($this->path)) {
@@ -55,14 +57,14 @@ class Lists Extends Command
         $paths = Directory::scanRecursive($this->path, true, 'php');
         $items = [];
         foreach ($paths as $file) {
-            if(is_file($file)) {
-                $items[] = 'Laika\\App\\Model\\'.str_replace(["{$this->path}/", '.php','/'], ['','','\\'], $file);
+            if (is_file($file)) {
+                $items[] = 'Laika\\App\\Model\\' . str_replace(["{$this->path}/", '.php', '/'], ['', '', '\\'], $file);
             }
         }
 
         // Header
         $headers = ['#', 'Templates'];
-        
+
         // Find max width for "File Path" column
         $maxLength = max(array_map('strlen', $items));
         $col2Width = max(strlen($headers[1]), $maxLength);
@@ -80,7 +82,7 @@ class Lists Extends Command
         foreach ($items as $item) {
             $item = str_replace(["{$this->path}/", '.tpl.php'], [''], $item);
             printf("| %-3d | %-{$col2Width}s |\n", $count, $item);
-            $count ++;
+            $count++;
         }
 
         echo $line;

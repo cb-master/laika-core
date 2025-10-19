@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace Laika\Core;
 
 // Deny Direct Access
-defined('APP_PATH') || http_response_code(403).die('403 Direct Access Denied!');
+defined('APP_PATH') || http_response_code(403) . die('403 Direct Access Denied!');
 
 class Config
 {
@@ -65,7 +65,7 @@ class Config
         $name = strtolower($name);
 
         // Get Value
-        if($key !== null) {
+        if ($key !== null) {
             return $obj->config[$name][$key] ?? $default;
         }
         return $obj->config[$name] ?? $default;
@@ -87,7 +87,7 @@ class Config
 
         $file = "{$obj->path}/{$name}.php";
 
-        if(!is_file($file)) {
+        if (!is_file($file)) {
             return false;
         }
 
@@ -138,12 +138,12 @@ class Config
 
         $file = "{$obj->path}/{$name}.php";
 
-        if(!is_file($file)) {
+        if (!is_file($file)) {
             return false;
         }
 
         // Ensure config exists in memory
-        if (!isset($obj->config[$name]) || !is_array($obj->config[$name]))  {
+        if (!isset($obj->config[$name]) || !is_array($obj->config[$name])) {
             return false;
         }
 
@@ -170,7 +170,7 @@ class Config
         $file = $obj->path . "/{$name}.php";
 
         // Check File Already Exist
-        if(is_file($file)) {
+        if (is_file($file)) {
             return false;
         }
 
@@ -217,13 +217,13 @@ class Config
     private static function allign(array $array, int $spaces = 4): string
     {
         $content = "[\n";
-        foreach($array as $key => $value){
+        foreach ($array as $key => $value) {
             $comment = ucwords((string) str_replace('.', ' ', $key));
             if (is_array($value)) {
-                $content .= str_repeat(' ', $spaces)."// {$comment}\n" . str_repeat(' ', $spaces) . "'{$key}' => " . trim(self::allign($value, $spaces + 4), ';') . ",\n\n";
+                $content .= str_repeat(' ', $spaces) . "// {$comment}\n" . str_repeat(' ', $spaces) . "'{$key}' => " . trim(self::allign($value, $spaces + 4), ';') . ",\n\n";
             } else {
                 $value = self::exportValue($value);
-                $content .= str_repeat(' ', $spaces)."// {$comment}\n" . str_repeat(' ', $spaces) . "'{$key}' => {$value},\n\n";
+                $content .= str_repeat(' ', $spaces) . "// {$comment}\n" . str_repeat(' ', $spaces) . "'{$key}' => {$value},\n\n";
             }
         }
         return "{$content}" . str_repeat(' ', $spaces) . "];";
@@ -247,6 +247,6 @@ class Config
      */
     private static function make(array $array, int $spaces = 4): string
     {
-        return self::defaultContent().self::allign($array, $spaces);
+        return self::defaultContent() . self::allign($array, $spaces);
     }
 }

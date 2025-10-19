@@ -19,11 +19,11 @@ defined('APP_PATH') || http_response_code(403) . die('403 Direct Access Denied!'
 use Laika\Core\{Console\Command, Directory};
 
 // Rename View Class
-class Rename Extends Command
+class Rename extends Command
 {
     // App View Old Path
     protected string $old_path = APP_PATH . '/lf-templates';
-    
+
     // App View New Path
     protected string $new_path = APP_PATH . '/lf-templates';
 

@@ -13,9 +13,9 @@ declare(strict_types=1);
 
 namespace Laika\Core\Http;
 
-defined('APP_PATH') || http_response_code(403).die('403 Direct Access Denied!');
+defined('APP_PATH') || http_response_code(403) . die('403 Direct Access Denied!');
 
-use CBM\Core\{Config, Token, Uri};
+use Laika\Core\{Config, Token, Uri};
 
 class Response
 {
@@ -69,13 +69,14 @@ class Response
     public static function register(): void
     {
         $token = new Token();
+        $uri = new Uri();
         $customHeaders = [
-            "Request-Time"  =>   time(),
-            "App-Provider"  =>   Config::get('app', 'provider'),
-            "Authorization" =>   $token->generate([
-                    'uid'       =>  mt_rand(100001, 999999),
-                    'requestor' =>  Uri::current()
-                ])
+            "Request-Time"  =>  time(),
+            "App-Provider"  =>  Config::get('app', 'provider'),
+            "Authorization" =>  $token->generate([
+                'uid'       =>  mt_rand(100001, 999999),
+                'requestor' =>  $uri->current()
+            ])
         ];
 
         $headers = array_merge(self::$headers, $customHeaders);

@@ -11,11 +11,10 @@
 
 declare(strict_types=1);
 
-// Namespace
 namespace Laika\Core;
 
 // Deny Direct Access
-defined('APP_PATH') || http_response_code(403).die('403 Direct Access Denied!');
+defined('APP_PATH') || http_response_code(403) . die('403 Direct Access Denied!');
 
 use Exception;
 
@@ -60,9 +59,9 @@ class Language
     public static function path(?string $path = null): string
     {
         // Set New Path if Argument is Not Blank or Null
-        if ($path) {            
+        if ($path) {
             $path = str_replace('\\', '/', $path);
-            self::$path .= '/'.trim($path, '/');
+            self::$path .= '/' . trim($path, '/');
         }
         // Make Directory If Doesn't Exists
         Directory::make(self::$path);

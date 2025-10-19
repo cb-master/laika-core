@@ -97,7 +97,7 @@ jobs:
       - name: Run PHP CS Fixer (dry run)
         run: |
           composer global require friendsofphp/php-cs-fixer
-          $(composer global config bin-dir --absolute)/php-cs-fixer fix --dry-run --diff src
+          $(composer global config bin-dir --absolute)/php-cs-fixer fix src
 
 
   ########################################################

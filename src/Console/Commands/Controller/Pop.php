@@ -19,7 +19,7 @@ defined('APP_PATH') || http_response_code(403) . die('403 Direct Access Denied!'
 use Laika\Core\Console\Command;
 
 // Remove Controller Class
-class Pop Extends Command
+class Pop extends Command
 {
     // App Controller Path
     protected string $path = APP_PATH . '/lf-app/Controller';
@@ -53,7 +53,7 @@ class Pop Extends Command
 
         $file = "{$this->path}/{$parts['name']}.php";
 
-         // Check Controller Path is Valid
+        // Check Controller Path is Valid
         if (!is_file($file)) {
             $this->error("Invalid Controller or Path: '{$params[0]}'");
             return;
@@ -63,7 +63,7 @@ class Pop Extends Command
             $this->error("Failed to Remove Controller: '{$file}'");
             return;
         }
-        
+
         $this->info("Controller Removed Successfully: '{$params[0]}'");
         return;
     }

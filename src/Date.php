@@ -11,11 +11,10 @@
 
 declare(strict_types=1);
 
-// Namespace
 namespace Laika\Core;
 
 // Deny Direct Access
-defined('APP_PATH') || http_response_code(403).die('403 Direct Access Denied!');
+defined('APP_PATH') || http_response_code(403) . die('403 Direct Access Denied!');
 
 use DateTimeZone;
 use DateInterval;
@@ -32,8 +31,8 @@ class Date
     // Timezone
     protected string $timezone;
 
-    // Initiate Date Class
     /**
+     * Initiate Date Class
      * @param string $time Optional Argument. Default is 'now'.
      * @param string $format Optional Argument. Default is 'Y-m-d H:i:s'.
      * @param ?string $timezone Optional Argument. Default is null.
@@ -56,8 +55,8 @@ class Date
         return new static('now', $format, $timezone);
     }
 
-    // Get Formated DateTime
     /**
+     * Get Formated DateTime
      * @param string Optional Argument. Default is null
      * @return string
      */
@@ -66,8 +65,8 @@ class Date
         return $this->dateTime->format($format ?: $this->format);
     }
 
-    // Modify DateTime.
     /**
+     * Modify DateTime
      * @param $modifier Required Argument. Example: '+1 day'
      * @return object
      */
@@ -77,8 +76,8 @@ class Date
         return $this;
     }
 
-    // Set DateTime Format.
     /**
+     * Set DateTime Format
      * @param $format Required Argument. Example: 'Y-m-d H:i:s'
      * @return object
      */
@@ -88,49 +87,89 @@ class Date
         return $this;
     }
 
+    /**
+     * Get Timestamp
+     * @return int
+     */
     public function getTimestamp(): int
     {
         return $this->dateTime->getTimestamp();
     }
 
-    public function setTimestamp(int $timestamp): static
+    /**
+     * Set Timestamp
+     * @param int $timestamp Required Argument.
+     * @return self
+     */
+    public function setTimestamp(int $timestamp): self
     {
         $this->dateTime->setTimestamp($timestamp);
         return $this;
     }
 
-    public function setTimezone(string $timezone): static
+    /**
+     * Set Timezone
+     * @param string $timezone Required Argument. Example: 'UTC'
+     * @return self
+     */
+    public function setTimezone(string $timezone): self
     {
         $this->timezone = $timezone;
         $this->dateTime->setTimezone(new DateTimeZone($this->timezone));
         return $this;
     }
 
+    /**
+     * Get Timezone
+     * @return string
+     */
     public function getTimezone(): string
     {
         return $this->timezone;
     }
 
+    /**
+     * Get Difference Between Two Dates
+     * @param Date $other Required Argument.
+     * @return DateInterval
+     */
     public function diff(Date $other): DateInterval
     {
         return $this->dateTime->diff($other->dateTime);
     }
 
+    /**
+     * Get DateTime Object
+     * @return DateTime
+     */
     public function getDateTime(): DateTime
     {
         return $this->dateTime;
     }
 
+    /**
+     * Convert to UTC
+     * @return self
+     */
     public function toUtc(): static
     {
         return $this->setTimezone('UTC');
     }
 
+    /**
+     * Convert to Local Timezone
+     * @param string $timezone Required Argument. Example: 'America/New_York'
+     * @return self
+     */
     public function toLocal(string $timezone): static
     {
         return $this->setTimezone($timezone);
     }
 
+    /**
+     * Convert to Array
+     * @return array{year:int,month:int,day:int,hour:int,minute:int,second:int,timezone:string,timestamp:int}
+     */
     public function toArray(): array
     {
         return [
@@ -145,6 +184,11 @@ class Date
         ];
     }
 
+    /**
+     * Get Human Readable Difference
+     * @param Date|null $other Optional Argument. Default is null.
+     * @return string
+     */
     public function humanDiff(?Date $other = null): string
     {
         $other = $other ?: Date::now($this->format, $this->timezone);
@@ -172,6 +216,11 @@ class Date
         return 'just now';
     }
 
+    /**
+     * Get Short Human Readable Difference
+     * @param Date|null $other Optional Argument. Default is null.
+     * @return string
+     */
     public function humanDiffShort(?Date $other = null): string
     {
         $other = $other ?: Date::now($this->format, $this->timezone);
@@ -198,13 +247,20 @@ class Date
         return 'now';
     }
 
+    /**
+     * Create Date from Format
+     * @param string $format Required Argument. Example: 'Y-m-d H:i:s'
+     * @param string $time Required Argument. Example: '2024-01-01 12:00:00'
+     * @param string $outputFormat Optional Argument. Default is 'Y-m-d H:i:s'.
+     * @param string $timezone Optional Argument. Default is 'UTC'.
+     * @return self
+     */
     public static function fromFormat(
         string $format,
         string $time,
         string $outputFormat = 'Y-m-d H:i:s',
         string $timezone = 'UTC'
-    ): static
-    {
+    ): self {
         $tz = new DateTimeZone($timezone);
         $dt = DateTime::createFromFormat($format, $time, $tz);
         $instance = new static('now', $outputFormat, $timezone);
@@ -212,6 +268,10 @@ class Date
         return $instance;
     }
 
+    /**
+     * String Representation
+     * @return string
+     */
     public function __toString(): string
     {
         return $this->format();

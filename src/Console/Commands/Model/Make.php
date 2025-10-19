@@ -16,9 +16,9 @@ namespace Laika\Core\Console\Commands\Model;
 // Deny Direct Access
 defined('APP_PATH') || http_response_code(403) . die('403 Direct Access Denied!');
 
-use Laika\Core\{Console\Command,Directory};
+use Laika\Core\{Console\Command, Directory};
 
-class Make Extends Command
+class Make extends Command
 {
     // App Model Path
     protected string $path = APP_PATH . '/lf-app/Model';
@@ -52,7 +52,7 @@ class Make Extends Command
         $parts = $this->parts($params[0]);
 
         $this->path .= $parts['path'];
-        
+
         // Make Directory if Not Exist
         if (!Directory::exists($this->path)) {
             Directory::make($this->path);
@@ -74,7 +74,7 @@ class Make Extends Command
             '{{NAME}}',
             '{{TABLE_NAME}}',
             '{{PRIMARY_KEY}}'
-        ],[
+        ], [
             $parts['namespace'],
             $parts['name'],
             $table,

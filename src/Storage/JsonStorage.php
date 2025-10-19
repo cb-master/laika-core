@@ -16,7 +16,7 @@ namespace Laika\Core\Storage;
 use RuntimeException;
 
 // Deny Direct Access
-defined('APP_PATH') || http_response_code(403).die('403 Direct Access Denied!');
+defined('APP_PATH') || http_response_code(403) . die('403 Direct Access Denied!');
 
 /**
  * JSON Storage
@@ -31,7 +31,7 @@ class JsonStorage
     public function __construct(?string $path = null)
     {
         $this->path = $path ?: APP_PATH . '/lf-storage';
-        if(!realpath($this->path)) {
+        if (!realpath($this->path)) {
             throw new RuntimeException("Invalid Json Storage '{$this->path}'");
         }
     }
@@ -43,7 +43,7 @@ class JsonStorage
      */
     public function set(string $name, array $array): bool
     {
-        $name = '/'.trim($name, '/');
+        $name = '/' . trim($name, '/');
         $file = $this->path . $name . '.json';
         $old_contents = [];
         if (is_file($file)) {
@@ -54,7 +54,7 @@ class JsonStorage
             }
         }
         $contents = array_merge($old_contents, $array);
-        return file_put_contents($file, json_encode($contents, JSON_PRETTY_PRINT|JSON_FORCE_OBJECT|JSON_NUMERIC_CHECK)) !== false;
+        return file_put_contents($file, json_encode($contents, JSON_PRETTY_PRINT | JSON_FORCE_OBJECT | JSON_NUMERIC_CHECK)) !== false;
     }
 
     /**
@@ -65,7 +65,7 @@ class JsonStorage
      */
     public function get(string $name, ?string $key = null): int|null|string|array
     {
-        $name = '/'.trim($name, '/');
+        $name = '/' . trim($name, '/');
         $file = $this->path . $name . '.json';
         if (!is_file($file)) {
             return null;

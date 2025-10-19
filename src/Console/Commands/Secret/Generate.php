@@ -16,9 +16,9 @@ namespace Laika\Core\Console\Commands\Secret;
 // Deny Direct Access
 defined('APP_PATH') || http_response_code(403) . die('403 Direct Access Denied!');
 
-use Laika\Core\{Console\Command,Config};
+use Laika\Core\{Console\Command, Config};
 
-class Generate Extends Command
+class Generate extends Command
 {
     /**
      * Run the command to create a new controller.
@@ -36,8 +36,8 @@ class Generate Extends Command
 
         $byte = (int) $byte;
         // Create Secret Config File if Not Exist
-        if(!Config::has('secret')) {
-            Config::create('secret', ['key'=>bin2hex(random_bytes($byte))]);
+        if (!Config::has('secret')) {
+            Config::create('secret', ['key' => bin2hex(random_bytes($byte))]);
         }
 
         // Create Secret Key Value
