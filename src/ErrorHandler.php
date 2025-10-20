@@ -32,9 +32,6 @@ class ErrorHandler
     // Error Exceptions
     protected static array $exceptions = [];
 
-    // Has Output
-    protected static bool $hasOutput = false;
-
     // Register Error Handlers
     /**
      * @param bool $debug Whether to enable debug mode.
@@ -42,7 +39,7 @@ class ErrorHandler
      */
     public static function register(): void
     {
-        self::$debug = (bool) Config::get('env', 'debug', true);
+        self::$debug = (bool) option('debug', true);
 
         if (self::$debug) {
             error_reporting(E_ALL);
@@ -77,22 +74,10 @@ class ErrorHandler
      */
     public static function handleException(Throwable $exception): void
     {
-        if (self::$hasOutput) {
-            Response::code(500);
-            // Already output error, just exit
-            return;
-        }
-        self::$hasOutput = true;
-
         self::$exceptions[] = $exception;
         self::logError($exception);
 
-        if (self::$debug) {
-            self::errorHtml();
-        } else {
-            self::internalErrorHtml();
-        }
-
+        self::$debug ? self::errorHtml() : self::internalErrorHtml();
         return;
     }
 
@@ -102,12 +87,6 @@ class ErrorHandler
      */
     public static function handleShutdown(): void
     {
-        if (self::$hasOutput) {
-            Response::code(500);
-            // Already output error, just exit
-            return;
-        }
-
         $error = error_get_last();
         if ($error && in_array($error['type'], [E_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR])) {
             self::$exceptions[] = new ErrorException(
@@ -120,12 +99,8 @@ class ErrorHandler
         }
 
         if (!empty(self::$exceptions)) {
-            // Response::code(500);
-            if (self::$debug) {
-                self::errorHtml();
-            } else {
-                self::internalErrorHtml();
-            }
+            Response::code(500);
+            self::$debug ? self::errorHtml() : self::internalErrorHtml();
             return;
         }
     }
