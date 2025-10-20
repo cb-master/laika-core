@@ -375,7 +375,7 @@ class Router
                 $runner = function ($index, array $context = []) use (&$runner, $middlewares, $callback, $matches) {
                     if (isset($middlewares[$index])) {
                         [$name, $params] = self::parseMiddleware($middlewares[$index], $matches);
-                        $middlewareClass = "CBM\\App\\Middleware\\{$name}";
+                        $middlewareClass = "Laika\\App\\Middleware\\{$name}";
 
                         if (!class_exists($middlewareClass)) {
                             throw new InvalidArgumentException("Invalid Middleware Detected: {$middlewareClass}");
@@ -444,7 +444,7 @@ class Router
 
                 foreach ($afterwares as $mw) {
                     [$name, $params] = self::parseMiddleware($mw, $matches);
-                    $middlewareClass = "CBM\\App\\Middleware\\{$name}";
+                    $middlewareClass = "Laika\\App\\Middleware\\{$name}";
 
                     if (class_exists($middlewareClass)) {
                         $instance = new $middlewareClass();
@@ -649,7 +649,7 @@ class Router
         // Controller string syntax: 'Controller@method'
         if (is_string($callback) && str_contains($callback, '@')) {
             [$controller, $method] = explode('@', $callback);
-            $controller = "CBM\\App\\Controller\\{$controller}";
+            $controller = "Laika\\App\\Controller\\{$controller}";
 
             if (!class_exists($controller) || !method_exists($controller, $method)) {
                 throw new InvalidArgumentException("Controller or method not found: {$controller}@{$method}");
