@@ -40,12 +40,19 @@ class Template extends Engine
         $templateSubDirectory = $templateSubDirectory ? '/' . trim($templateSubDirectory, '/') : '';
         $this->templateDirectory = APP_PATH . "/lf-templates{$templateSubDirectory}";
         Directory::make($this->templateDirectory);
+
         // Make Template Cache Direcory
         $cacheSubDirectory = $cacheSubDirectory ? '/' . trim($cacheSubDirectory, '/') : '';
         $this->cacheDirectory = APP_PATH . "/lf-cache{$cacheSubDirectory}";
         Directory::make($this->cacheDirectory);
+
         // Run Template Engine
         parent::__construct($this->templateDirectory, $this->cacheDirectory);
         $this->assign('app_info', Env::get('app|info'));
+    }
+
+    protected function view(string $name): string
+    {
+        return $this->render($name);
     }
 }

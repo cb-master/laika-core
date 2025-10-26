@@ -278,7 +278,7 @@ class Handler
      * Get Named Route Url
      * @param string $name Route Name. Example: 'page' or 'post.id'
      * @param array $params Route Named Parameters. Example: ['id'=>34, 'action'=>'delete']
-     * @return void
+     * @return string
      */
     public static function namedUrl(string $name, array $params = []): string
     {
