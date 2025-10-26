@@ -1,4 +1,4 @@
-name: Laika PHP 8.1 - 8.4 Check
+name: Laika PHP Compatibility Check
 
 on:
   push:

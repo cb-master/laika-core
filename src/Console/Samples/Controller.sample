@@ -30,6 +30,6 @@ class {{NAME}} extends Template
         $this->assign('welcome', 'This is {{NAME}} Page');
         
         // load View File
-        $this->view('{{VIEW}}');
+        return $this->view('{{VIEW}}');
     }
 }

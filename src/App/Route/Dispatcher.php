@@ -13,12 +13,15 @@ declare(strict_types=1);
 
 namespace Laika\Core\App\Route;
 
-use Laika\Core\Uri;
+use Laika\Core\{Config, Uri, App\Env};
 
 class Dispatcher
 {
     public static function dispatch(?string $requestUrl = null): void
     {
+        // Set App Info Environment
+        Env::set('app|info', Config::get('app'));
+
         // Get Request Url
         if ($requestUrl == null) {
             $uri = new Uri();
