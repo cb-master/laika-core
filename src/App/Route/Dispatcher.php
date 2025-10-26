@@ -1,0 +1,77 @@
+<?php
+
+/**
+ * Laika PHP MVC Framework
+ * Author: Showket Ahmed
+ * Email: riyadhtayf@gmail.com
+ * License: MIT
+ * This file is part of the Laika PHP MVC Framework.
+ * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
+ */
+
+declare(strict_types=1);
+
+namespace Laika\Core\App\Route;
+
+use Laika\Core\Uri;
+
+class Dispatcher
+{
+    public static function dispatch(?string $requestUrl = null): void
+    {
+        // Get Request Url
+        if ($requestUrl == null) {
+            $uri = new Uri();
+            $requestUrl = Url::normalize($uri->path());
+        } else {
+            $requestUrl = Url::normalize($requestUrl);
+        }
+        // Get If Request Uri Matched With Router List
+        $res = Url::matchRequestRoute($requestUrl);
+
+        $params = $res['params'];
+
+        // Execute Fallback For Invalid Route
+        if ($res['route'] === null) {
+
+            // 404 Response
+            http_response_code(404);
+
+            $fallbacks = Handler::getFallbacks();
+
+            foreach (array_reverse($fallbacks) as $key => $callable){
+                if (str_starts_with(Url::normalizeFallbackKey($requestUrl), $key)) {
+                    echo Invoke::controller($callable, $params);
+                    return;
+                }
+            }
+            /*---- Execute Fallback ----*/
+            echo _404::show();
+            return;
+        }
+
+        $routes = Handler::getRoutes(Url::method());
+        $route = $routes[$res['route']];
+        
+        // $invoker = self::invoke($route['controller'], $params);
+
+        // Collect before middlewares in order
+        $middlewares = array_merge(
+            $route['middlewares']['global'],
+            $route['middlewares']['group'],
+            $route['middlewares']['route']
+        );
+
+        // Run Middlewares -> Controller
+        $response = Invoke::middleware($middlewares, $route['controller'], $params);
+
+        // Run Afterware
+        $afterwares = array_merge(
+            $route['afterwares']['global'],
+            $route['afterwares']['group'],
+            $route['afterwares']['route']
+        );
+
+        echo empty($afterwares) ? $response : Invoke::afterware($afterwares, $response, $params);
+    }
+}
