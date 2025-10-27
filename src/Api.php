@@ -37,6 +37,11 @@ class Api
     protected string $method;
 
     /**
+     * @var ?string $message Message to Send
+     */
+    protected ?string $message;
+
+    /**
      * @var array $acceptableMethods Acceptable Request Methods
      */
     protected array $acceptableMethods;
@@ -49,11 +54,12 @@ class Api
     // Initiate API Object
     public function __construct()
     {
-        $this->accepted         =   ['application/json', 'application/x-www-form-urlencoded'];
-        $this->contentType      =   strtolower(strtok($_SERVER['CONTENT_TYPE'] ?? 'application/json', ';'));
-        $this->method           =   Http\Request::method();
-        $this->acceptableMethods =   ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'];
-        $this->allowedOrigin    =   '*';
+        $this->accepted             =   ['application/json', 'application/x-www-form-urlencoded'];
+        $this->contentType          =   strtolower(strtok($_SERVER['CONTENT_TYPE'] ?? 'application/json', ';'));
+        $this->method               =   Http\Request::method();
+        $this->message              =   null;
+        $this->acceptableMethods    =   ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'];
+        $this->allowedOrigin        =   '*';
 
         // Handle CORS preflight
         if ($this->method === 'OPTIONS') {
@@ -66,9 +72,19 @@ class Api
      * @param string $origin
      * @return void
      */
-    public function setAllowedOrogon(string $origin): void
+    public function setAllowedOrigin(string $origin): void
     {
         $this->allowedOrigin = $origin;
+    }
+
+    /**
+     * Set Message
+     * @param string $message
+     * @return void
+     */
+    public function message(string $message): void
+    {
+        $this->message = htmlspecialchars(trim($message));
     }
 
     /**
@@ -152,28 +168,33 @@ class Api
     /**
      * @param array $payload Payload Data
      * @param int $status Response Status
+     * @param array $additional Additionl Response to Send
      * @return never Send Response
      */
-    public function send(array $payload, int $status = 200): never
+    public function send(array $payload, int $status = 200, array $additional = []): never
     {
         if (!in_array($this->method, $this->acceptableMethods)) {
             $status = 415;
-            $payload = [
+            $payload = [];
+            $data = [
                 "status"    =>  $status,
-                "data"      =>  [],
+                "data"      =>  $payload,
                 "message"   =>  "Unsupported Method: '{$this->method}'",
                 "context"   =>  "Accepted Methods Are: " . implode(', ', $this->acceptableMethods),
                 "timestamp" =>  date('c')
             ];
-        }
-
-        // Add Timestamp if Doesn't Exists
-        if (!isset($payload['timestamp'])) {
-            $payload = array_merge($payload, ['timestamp' => date('c')]);
+        } else {
+            $data = array_merge([
+                "status"    =>  $status,
+                "data"      =>  $payload,
+                "message"   =>  $this->message ?: "Success",
+                "context"   =>  "Accepted",
+                "timestamp" =>  date('c')
+            ], $additional);
         }
 
         // Build body
-        $body = json_encode($payload, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_FORCE_OBJECT);
+        $body = json_encode($data, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_FORCE_OBJECT);
 
         $charset  = $this->detectCharset();
 

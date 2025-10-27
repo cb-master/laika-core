@@ -135,7 +135,11 @@ function host(): string
  * Get Named Route
  * @return string
  */
-function named(string $name, array $params = [], bool $url = false)
+function named(string $name, array $params = [], bool $url = false): string
 {
-    return Router::url($name, $params, $url);
+    $path = Router::url($name, $params);
+    if ($url) {
+        return trim(host(), '/') . "/{$path}";
+    }
+    return $path;
 }
