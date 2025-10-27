@@ -94,7 +94,7 @@ class Handler
         // Capitalize Method
         self::$lastMethod = strtoupper($method);
         // Create Uri
-        self::$lastUri = self::$group . Url::normalize($uri);
+        self::$lastUri = Url::normalize(self::$group . Url::normalize($uri));
         self::$onlyRoutes[self::$lastMethod][] = self::$lastUri;
         // Set Route
         self::$routes[self::$lastMethod][self::$lastUri]['controller'] = $controller;
