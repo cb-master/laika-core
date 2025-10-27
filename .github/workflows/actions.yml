@@ -6,8 +6,7 @@ on:
       - main
       - beta
     tags:
-      - 'v*.*.*-stable'
-      - 'v*.*.*-beta'
+      - 'v*.*.*'
   pull_request:
     branches:
       - main
@@ -159,13 +158,8 @@ jobs:
       - name: Define Release Channel and Artifact Name
         id: channel
         run: |
-          if [[ "${{ github.ref_name }}" == *-beta ]]; then
-            echo "CHANNEL=beta" >> $GITHUB_ENV
-            echo "ARTIFACT=laika-core-beta" >> $GITHUB_ENV
-          else
-            echo "CHANNEL=stable" >> $GITHUB_ENV
-            echo "ARTIFACT=laika-core-stable" >> $GITHUB_ENV
-          fi
+          echo "CHANNEL=CLI" >> $GITHUB_ENV
+          echo "ARTIFACT=laika-core-${{ github.ref_name }}" >> $GITHUB_ENV
 
       # Prepare Build Artifact
       - name: Prepare release artifact
@@ -194,12 +188,11 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           draft: false
-          prerelease: ${{ env.CHANNEL == 'beta' && true || false }}
           overwrite: true
           tag_name: ${{ github.ref_name }}
-          name: "${{ env.CHANNEL == 'beta' && 'BETA' || 'STABLE' }} - ${{ github.ref_name }}"
+          name: ${{ github.ref_name }}
           body: |
-            🚀 **Laika Framework Core ${{ env.CHANNEL == 'beta' && 'BETA' || 'STABLE' }} - ${{ github.ref_name }} Release**
+            🚀 **${{ github.ref_name }} Release**
 
             **Tag:** ${{ github.ref_name }}
             **Commit:** ${{ github.sha }}
