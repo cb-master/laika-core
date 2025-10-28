@@ -51,7 +51,7 @@ class Template extends Engine
         $this->assign('app_info', Env::get('app|info'));
     }
 
-    protected function view(string $name): string
+    public function view(string $name): string
     {
         return $this->render($name);
     }

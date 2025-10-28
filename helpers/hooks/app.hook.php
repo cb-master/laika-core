@@ -22,7 +22,10 @@ use Laika\Core\{Language, Cookie, Config};
 /*------------------------- APP FILTERS --------------------------*/
 ####################################################################
 // App Host
-add_filter('app.host', function(): string { return host(); });
+add_filter('app.host', function(): string
+{
+    return rtrim(host(), '/') . '/';
+});
 
 // App Name
 add_filter('app.name', function(){
