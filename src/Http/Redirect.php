@@ -19,6 +19,7 @@ if (php_sapi_name() !== 'cli' && !defined('APP_PATH')) {
     exit('Direct Access Denied!');
 }
 
+use Laika\Session\Session;
 use Laika\Core\Uri;
 
 class Redirect
@@ -50,6 +51,18 @@ class Redirect
     public function back(int $code = 302): never
     {
         $this->send($_SERVER['HTTP_REFERER'] ?? $this->host, $code);
+    }
+
+    /**
+     * Set Flass Message
+     * @param string $message Message to set.
+     * @param bool $status
+     * @return self
+     */
+    public function with(string $message, bool $status): self
+    {
+        Session::set('message', ['info'=>$message,'status'=>$status]);
+        return $this;
     }
 
     /**
