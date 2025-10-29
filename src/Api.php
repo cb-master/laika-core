@@ -199,6 +199,7 @@ class Api
         $charset  = $this->detectCharset();
 
         // Set Headers
+        Http\Response::code($status);
         Http\Response::setHeader([
             "Content-Type"  =>  "application/json; charset={$charset}",
             "Vary"          =>  "Accept, Accept-Charset"
