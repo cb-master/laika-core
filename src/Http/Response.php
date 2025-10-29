@@ -34,6 +34,10 @@ class Response
         "X-Powered-By"                      =>  "Laika",
         "X-Frame-Options"                   =>  "sameorigin",
         "Content-Security-Policy"           =>  "frame-ancestors 'self'",
+        "Referrer-Policy"                   =>  "origin-when-cross-origin",
+        "Cache-Control"                     =>  "no-store, no-cache, must-revalidate",
+        "Pragma"                            =>  "no-cache",
+        "Expires"                           =>  "0",
     ];
 
     /**
@@ -75,7 +79,7 @@ class Response
         $token = new Token();
         $uri = new Uri();
         $customHeaders = [
-            "Request-Time"  =>  time(),
+            "Request-Time"  =>  option('start.time', time()),
             "App-Provider"  =>  Config::get('app', 'provider'),
             "Authorization" =>  $token->generate([
                 'uid'       =>  mt_rand(100001, 999999),
