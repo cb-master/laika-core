@@ -24,28 +24,10 @@ use Laika\Core\Uri;
 class Redirect
 {
     /**
-     * @property ?self $instance
-     */
-    protected static ?self $instance = null;
-
-    /**
      * App Host
      * @var string $host
      */
     protected string $host;
-
-    /**
-     * Redirect Url
-     * @var string $to
-     */
-    protected string $to;
-
-    /**
-     * Response Code
-     * @var int $code
-     */
-    protected int $code;
-
 
     ##################################################################
     /*------------------------- PUBLIC API -------------------------*/
@@ -58,18 +40,6 @@ class Redirect
     {
         $uri = new Uri();
         $this->host =   apply_filter('app.host', $uri->base());
-        $this->to   =   $_SERVER['HTTP_REFERER'] ?? $this->host;
-        $this->code =   302;
-    }
-
-    /**
-     * Get Request Instance
-     * @return static
-     */
-    public static function getInstance(): static
-    {
-        self::$instance ??= new self();
-        return self::$instance;
     }
 
     /**
@@ -77,39 +47,35 @@ class Redirect
      * @return string
      * @return never
      */
-    public function back(?int $code = null): never
+    public function back(int $code = 302): never
     {
-        $this->code = $code ?: $this->code;
-        $this->send();
+        $this->send($_SERVER['HTTP_REFERER'] ?? $this->host, $code);
     }
 
     /**
      * Get Method
      * @return never
      */
-    public function to(string $to, ?int $code = null): never
+    public function to(string $to, int $code = 302): never
     {
         $url = parse_url($to, PHP_URL_HOST);
-        if ($url) {
-            $this->to = $to;
-        } else {
-            $this->to = $this->host . trim($to, '/');
+        if (!$url) {
+            $to = $this->host . trim($to, '/');
         }
-        $this->code = $code ?: $this->code;
-        $this->send();
+        $this->send($to, $code);
     }
 
-    ###################################################################
+    ####################################################################
     /*------------------------- INTERNAL API -------------------------*/
-    ###################################################################
+    ####################################################################
 
     /**
      * Redirect
      * @return never
      */
-    private function send(): never
+    private function send(?string $to = null, int $code = 302): never
     {
-        header('Location:' . $this->to, true, $this->code);
+        header("Location:{$to}", true, $code);
         exit();
     }
 
