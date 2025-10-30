@@ -13,27 +13,32 @@ declare(strict_types=1);
 
 namespace Laika\Core\App\Route;
 
-use Laika\Core\{Config, Uri, App\Env};
+use Laika\Core\{Config, Uri, Local, Token, App\Env, App\Connect, Http\Response};
 
 class Dispatcher
 {
-    public static function dispatch(?string $requestUrl = null): void
+    public static function dispatch(): void
     {
         // Set App Info Environment
         Env::set('app|info', Config::get('app'));
 
         // Get Request Url
-        if ($requestUrl == null) {
-            $uri = new Uri();
-            $requestUrl = Url::normalize($uri->path());
-        } else {
-            $requestUrl = Url::normalize($requestUrl);
-        }
+        $uri = new Uri();
+        $requestUrl = Url::normalize($uri->path());
+
         // Get If Request Uri Matched With Router List
         $res = Url::matchRequestRoute($requestUrl);
 
+        // Get Parameters
         $params = $res['params'];
 
+        // Load Local
+        array_key_exists($uri->segment(1), Handler::getGroups()) ? Local::load($uri->segment(1)) : Local::load();
+
+        // App Connect
+        if (!str_starts_with($res['route'] ?? '', '/resource')) {
+            self::connect();
+        }
         // Execute Fallback For Invalid Route
         if ($res['route'] === null) {
 
@@ -55,8 +60,6 @@ class Dispatcher
 
         $routes = Handler::getRoutes(Url::method());
         $route = $routes[$res['route']];
-        
-        // $invoker = self::invoke($route['controller'], $params);
 
         // Collect before middlewares in order
         $middlewares = array_merge(
@@ -76,5 +79,27 @@ class Dispatcher
         );
 
         echo empty($afterwares) ? $response : Invoke::afterware($afterwares, $response, $params);
+    }
+
+    /**
+     * Connect App
+     * @return void
+     */
+    private static function connect(): void
+    {
+        // Connect App DB & Session
+        Connect::start();
+        // Set Headers
+        $token = new Token();
+        $uri = new Uri();
+        Response::setHeader([
+            "Request-Time"  =>  option('start.time', time()),
+            "App-Provider"  =>  Config::get('app', 'name', 'Laika Framework'),
+            "Authorization" =>  $token->generate([
+                'uid'       =>  mt_rand(100001, 999999),
+                'requestor' =>  $uri->base()
+            ])
+        ]);
+        return;
     }
 }

@@ -54,25 +54,6 @@ add_filter('app.icon', function(?string $option_key = null): string {
     return apply_filter('app.host') . "resource/img/{$icon}";
 });
 
-// Language File Name
-add_filter('app.language', function(): string {
-    if(Cookie::get('language')){
-        Language::set(Cookie::get('language'));
-    }else{
-        $lang = option('language') ?: 'en';
-        Cookie::set('language', $lang);
-        Language::set($lang);
-    }
-    return Language::get();
-});
-
-// Load Language
-add_filter('app.language.load', function(?string $extension = null): void {
-    apply_filter('app.language');
-    require_once Language::path($extension);
-    return;
-});
-
 /**
  * Local Language
  * @param string $property Property of LANG Class

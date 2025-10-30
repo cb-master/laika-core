@@ -19,8 +19,6 @@ if (php_sapi_name() !== 'cli' && !defined('APP_PATH')) {
     exit('Direct Access Denied!');
 }
 
-use Laika\Core\{Config, Token, Uri};
-
 class Response
 {
     /**
@@ -76,20 +74,7 @@ class Response
      */
     public static function register(): void
     {
-        $token = new Token();
-        $uri = new Uri();
-        $customHeaders = [
-            "Request-Time"  =>  option('start.time', time()),
-            "App-Provider"  =>  Config::get('app', 'provider'),
-            "Authorization" =>  $token->generate([
-                'uid'       =>  mt_rand(100001, 999999),
-                'requestor' =>  $uri->current()
-            ])
-        ];
-
-        $headers = array_merge(self::$headers, $customHeaders);
-
-        foreach ($headers as $key => $value) {
+        foreach (self::$headers as $key => $value) {
             header(trim($key) . ": " . trim((string) $value), true);
         }
     }
