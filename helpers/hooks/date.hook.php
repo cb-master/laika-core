@@ -27,7 +27,7 @@ use Laika\Core\Date;
  * @return string
  */
 add_filter('date.show', function(int $time): string{
-    $date = new Date();
+    $date = new Date(format:option('time.format', 'Y-M-d H:i:s'));
     $date->setTimestamp($time);
     return $date->format();
 });
