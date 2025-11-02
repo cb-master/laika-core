@@ -43,7 +43,7 @@ class Option
         try {
             $db = DB::getInstance();
             $option = $db->table(self::$table)->where(self::$key, '=', $name)->first(self::$value);
-            return $option[self::$value] ?? $default;
+            $default = $option[self::$value] ?? $default;
         } catch (\Throwable $th) {
             //
         }

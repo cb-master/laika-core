@@ -35,7 +35,7 @@ class Auth
     private string $table;
 
     // Cookie Name
-    private string $cookie = '__AUTH';
+    private string $cookie = '__AUTH_TOKEN';
 
     // Cookie Expire After TTL
     private int $ttl = 1800; // 1800 Seconds or 30 Minutes

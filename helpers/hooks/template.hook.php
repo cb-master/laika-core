@@ -10,6 +10,8 @@
 
 declare(strict_types=1);
 
+use Laika\Core\Http\Response;
+
 // Deny Direct Access
 if (php_sapi_name() !== 'cli' && !defined('APP_PATH')) {
     http_response_code(403);
@@ -26,4 +28,18 @@ add_filter('template.asset', function(string $file): string {
     }
     $file = trim($file, '/');
     return apply_filter('app.host') . "resource/{$file}";
+});
+
+// Set Template Default JS Vars
+add_filter('template.js.vars', function(): string{
+    $authorizarion = Response::get('authorization');
+    $appuri = trim(apply_filter('app.host'), '/');
+    $timeformat = option('time.format', 'Y-M-d H:i:s');
+    return <<<HTML
+        <script>
+                let token = '{$authorizarion}';
+                let appuri = '{$appuri}';
+                let timeformat = '{$timeformat}';
+            </script>\n
+    HTML;
 });

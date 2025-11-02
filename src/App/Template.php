@@ -20,7 +20,7 @@ if (php_sapi_name() !== 'cli' && !defined('APP_PATH')) {
 }
 
 use Laika\Template\Template as Engine;
-use Laika\Core\Directory;
+use Laika\Core\{Directory, Local};
 
 class Template extends Engine
 {
@@ -48,10 +48,13 @@ class Template extends Engine
 
         // Run Template Engine
         parent::__construct($this->templateDirectory, $this->cacheDirectory);
+
+        // Set Template Required Vars
         $this->assign('app_info', Env::get('app|info'));
+        $this->assign('local', Local::get());
     }
 
-    protected function view(string $name): string
+    public function view(string $name): string
     {
         return $this->render($name);
     }

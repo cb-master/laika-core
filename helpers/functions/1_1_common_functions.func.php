@@ -143,3 +143,13 @@ function named(string $name, array $params = [], bool $url = false): string
     }
     return $path;
 }
+
+/**
+ * Show Date
+ * @param int $unixtime
+ * @return string
+ */
+function showdate(int $unixtime): string
+{
+    return apply_filter('date.show', $unixtime);
+}

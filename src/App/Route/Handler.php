@@ -23,6 +23,11 @@ class Handler
     private static string $group = '';
 
     /**
+     * @var string $group
+     */
+    private static array $groups = [];
+
+    /**
      * @var array $routes
      */
     private static array $routes = [];
@@ -131,6 +136,8 @@ class Handler
     {
         // push normalized prefix fragment onto stack (ensures leading slash, no trailing)
         self::$group = Url::normalize($prefix);
+        $gkey = trim($prefix, '/');
+        self::$groups = array_merge(self::$groups, [$gkey => $gkey]);
 
         self::$groupMiddlewares = (array) $middlewares;
         self::$groupAfterwares = (array) $afterwares;
@@ -248,6 +255,15 @@ class Handler
     public static function getNamedRoutes(): array
     {
         return self::$namedRoutes;
+    }
+    
+    /**
+     * Get All Groups
+     * @return array
+     */
+    public static function getGroups(): array
+    {
+        return self::$groups;
     }
 
     /**

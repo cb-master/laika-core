@@ -126,40 +126,28 @@ class Api
 
         // Handle missing header
         if (!$header) {
-            $this->send([
-                "status"    => 401,
-                "message"   => "Missing Authorization Header",
-                "context"   => "Expected 'Authorization: Bearer {token}'",
-            ], 401);
+            $this->message('Missing Authorization Header');
+            $this->send([], 203);
         }
 
         // Validate Bearer pattern
         if (!preg_match('/^Bearer\s+(\S+)$/i', trim($header), $matches)) {
-            $this->send([
-                "status"    => 400,
-                "message"   => "Invalid Authorization Format",
-                "context"   => "Expected format: Bearer {token}",
-            ], 400);
+            $this->message('Invalid Authorization Header Format');
+            $this->send([], 400);
         }
 
         $token = $matches[1] ?? '';
 
         // Handle empty token
         if (empty($token)) {
-            $this->send([
-                "status"    => 401,
-                "message"   => "Empty Bearer Token",
-                "context"   => "Bearer token cannot be empty",
-            ], 401);
+            $this->message('Empty Bearer Token');
+            $this->send([], 203);
         }
 
         $obj = new Token();
         if (!$obj->validateToken($token)) {
-            $this->send([
-                "status"    => 401,
-                "message"   => "Token Expired",
-                "context"   => "Please Regenerate Bearer Token!",
-            ], 401);
+            $this->message('Token Expired');
+            $this->send([], 401);
         }
 
         return $token;
@@ -188,7 +176,7 @@ class Api
                 "status"    =>  $status,
                 "data"      =>  $payload,
                 "message"   =>  $this->message ?: "Success",
-                "context"   =>  "Accepted",
+                "context"   =>  Http\Response::codes()[$status]['message'] ?? 'Unassigned',
                 "timestamp" =>  date('c')
             ], $additional);
         }
@@ -199,6 +187,7 @@ class Api
         $charset  = $this->detectCharset();
 
         // Set Headers
+        Http\Response::code($status);
         Http\Response::setHeader([
             "Content-Type"  =>  "application/json; charset={$charset}",
             "Vary"          =>  "Accept, Accept-Charset"

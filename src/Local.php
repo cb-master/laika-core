@@ -21,7 +21,7 @@ if (php_sapi_name() !== 'cli' && !defined('APP_PATH')) {
 
 use Exception;
 
-class Language
+class Local
 {
     // Language Path
     private static string $path = APP_PATH . '/lf-lang';
@@ -55,11 +55,11 @@ class Language
     }
 
     /**
-     * Set or Get Path
+     * Set or Load Path
      * @param ?string Optional Argument. Default is null
-     * @return string
+     * @return void
      */
-    public static function path(?string $path = null): string
+    public static function load(?string $path = null): void
     {
         // Set New Path if Argument is Not Blank or Null
         if ($path) {
@@ -103,6 +103,7 @@ class Language
             $file->write($content);
         }
         // Return Language Path
-        return $lang_path;
+        require_once $lang_path;
+        return;
     }
 }
