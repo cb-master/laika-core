@@ -61,6 +61,7 @@ class Template
         $this->assign('app', Env::get('app|info'));
         $this->assign('local', Local::get());
         $this->addFilter('filter', 'apply_filter');
+        $this->addFilter('named', 'named');
     }
 
     public function view(string $name): string
