@@ -29,7 +29,7 @@ class Response
     /**
      * Default Headers
      */
-    private array $headers;
+    protected array $headers;
 
     /**
      * Initiate Instance
@@ -97,7 +97,7 @@ class Response
      */
     public function register(): void
     {
-        foreach (self::$headers as $key => $value) {
+        foreach ($this->headers as $key => $value) {
             header(trim($key) . ": " . trim((string) $value), true);
         }
     }
