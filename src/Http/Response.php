@@ -22,27 +22,50 @@ if (php_sapi_name() !== 'cli' && !defined('APP_PATH')) {
 class Response
 {
     /**
+     * @property ?self $instance
+     */
+    protected static ?self $instance = null;
+
+    /**
      * Default Headers
      */
-    private static array $headers = [
-        "Access-Control-Allow-Origin"       =>  "*",
-        "Access-Control-Allow-Methods"      =>  "GET, POST",
-        "Access-Control-Allow-Headers"      =>  "Authorization, Origin, X-Requested-With, Content-Type, Accept",
-        "Access-Control-Allow-Credentials"  =>  "true",
-        "X-Powered-By"                      =>  "Laika",
-        "X-Frame-Options"                   =>  "sameorigin",
-        "Content-Security-Policy"           =>  "frame-ancestors 'self'",
-        "Referrer-Policy"                   =>  "origin-when-cross-origin",
-        "Cache-Control"                     =>  "no-store, no-cache, must-revalidate",
-        "Pragma"                            =>  "no-cache",
-        "Expires"                           =>  "0",
-    ];
+    private array $headers;
+
+    /**
+     * Initiate Instance
+     */
+    public function __construct()
+    {
+        $this->headers = [
+            "Access-Control-Allow-Origin"       =>  "*",
+            "Access-Control-Allow-Methods"      =>  "GET, POST",
+            "Access-Control-Allow-Headers"      =>  "Authorization, Origin, X-Requested-With, Content-Type, Accept",
+            "Access-Control-Allow-Credentials"  =>  "true",
+            "X-Powered-By"                      =>  "Laika",
+            "X-Frame-Options"                   =>  "sameorigin",
+            "Content-Security-Policy"           =>  "frame-ancestors 'self'",
+            "Referrer-Policy"                   =>  "origin-when-cross-origin",
+            "Cache-Control"                     =>  "no-store, no-cache, must-revalidate",
+            "Pragma"                            =>  "no-cache",
+            "Expires"                           =>  "0",
+        ];
+    }
+
+    /**
+     * Get Instance
+     * @return self
+     */
+    public static function instance(): self
+    {
+        self::$instance ??= new self();
+        return self::$instance;
+    }
 
     /**
      * Set HTTP response code
      * @return int
      */
-    public static function code(int $code = 200): int
+    public function code(int $code = 200): int
     {
         http_response_code($code);
         return $code;
@@ -52,7 +75,7 @@ class Response
      * Set custom "X-Powered-By" header
      * return void
      */
-    public static function poweredBy(string $str): void
+    public function poweredBy(string $str): void
     {
         header("X-Powered-By: {$str}", true);
     }
@@ -61,7 +84,7 @@ class Response
      * Set or overwrite headers
      * @return void
      */
-    public static function setHeader(array $headers = []): void
+    public function setHeader(array $headers = []): void
     {
         foreach ($headers as $key => $value) {
             header(trim($key) . ": " . trim((string) $value), true);
@@ -72,7 +95,7 @@ class Response
      * Send default headers + framework-specific ones
      * @return void
      */
-    public static function register(): void
+    public function register(): void
     {
         foreach (self::$headers as $key => $value) {
             header(trim($key) . ": " . trim((string) $value), true);
@@ -84,7 +107,7 @@ class Response
      * @param string|null $key  Header key to fetch (case-insensitive)
      * @return array|string
      */
-    public static function get(?string $key = null): array|string
+    public function get(?string $key = null): array|string
     {
         $val = [];
         foreach (headers_list() as $header) {
@@ -103,7 +126,7 @@ class Response
      * Response Status Codes With Message & Reference
      * @return array
      */
-    public static function codes()
+    public function codes()
     {
         return [
             // 1xx Informational Responses

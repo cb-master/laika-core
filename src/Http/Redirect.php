@@ -25,6 +25,11 @@ use Laika\Core\Uri;
 class Redirect
 {
     /**
+     * @property ?self $instance
+     */
+    protected static ?self $instance = null;
+
+    /**
      * App Host
      * @var string $host
      */
@@ -41,6 +46,16 @@ class Redirect
     {
         $uri = new Uri();
         $this->host =   apply_filter('app.host', $uri->base());
+    }
+
+    /**
+     * Get Instance
+     * @return self
+     */
+    public static function instance(): self
+    {
+        self::$instance ??= new self();
+        return self::$instance;
     }
 
     /**

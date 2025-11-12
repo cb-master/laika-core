@@ -92,7 +92,7 @@ class Dispatcher
         // Set Headers
         $token = new Token();
         $uri = new Uri();
-        Response::setHeader([
+        Response::instance()->setHeader([
             "Request-Time"  =>  option('start.time', time()),
             "App-Provider"  =>  Config::get('app', 'name', 'Laika Framework'),
             "Authorization" =>  $token->generate([

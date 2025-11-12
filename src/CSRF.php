@@ -105,7 +105,7 @@ class CSRF
     public function validate(): bool
     {
         // If CSRF Request Key Missing or Blank, Return false
-        $request_token = (string) Request::input($this->key);
+        $request_token = (string) Request::instance()->input($this->key);
         if (!$request_token) {
             return false;
         }

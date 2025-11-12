@@ -32,7 +32,7 @@ add_filter('template.asset', function(string $file): string {
 
 // Set Template Default JS Vars
 add_filter('template.js.vars', function(): string{
-    $authorizarion = Response::get('authorization');
+    $authorizarion = Response::instance()->get('authorization');
     $appuri = trim(apply_filter('app.host'), '/');
     $timeformat = option('time.format', 'Y-M-d H:i:s');
     return <<<HTML

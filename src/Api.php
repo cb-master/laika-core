@@ -56,7 +56,7 @@ class Api
     {
         $this->accepted             =   ['application/json', 'application/x-www-form-urlencoded'];
         $this->contentType          =   strtolower(strtok($_SERVER['CONTENT_TYPE'] ?? 'application/json', ';'));
-        $this->method               =   Http\Request::method();
+        $this->method               =   Http\Request::instance()->method();
         $this->message              =   null;
         $this->acceptableMethods    =   ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'];
         $this->allowedOrigin        =   '*';
@@ -110,7 +110,7 @@ class Api
      */
     public function body(): array
     {
-        return Http\Request::all();
+        return Http\Request::instance()->all();
     }
 
     /**
@@ -176,7 +176,7 @@ class Api
                 "status"    =>  $status,
                 "data"      =>  $payload,
                 "message"   =>  $this->message ?: "Success",
-                "context"   =>  Http\Response::codes()[$status]['message'] ?? 'Unassigned',
+                "context"   =>  Http\Response::instance()->codes()[$status]['message'] ?? 'Unassigned',
                 "timestamp" =>  date('c')
             ], $additional);
         }
@@ -187,8 +187,8 @@ class Api
         $charset  = $this->detectCharset();
 
         // Set Headers
-        Http\Response::code($status);
-        Http\Response::setHeader([
+        Http\Response::instance()->code($status);
+        Http\Response::instance()->setHeader([
             "Content-Type"  =>  "application/json; charset={$charset}",
             "Vary"          =>  "Accept, Accept-Charset"
         ]);
@@ -223,7 +223,7 @@ class Api
             return;
         }
 
-        Http\Response::setHeader([
+        Http\Response::instance()->setHeader([
             "Access-Control-Allow-Origin"   =>  $this->allowedOrigin,
             "Access-Control-Allow-Methods"  =>  implode(', ', $this->acceptableMethods),
             "Access-Control-Allow-Headers"  =>  "Content-Type, Authorization, X-Requested-With, Accept, Accept-Encoding, Accept-Charset",
