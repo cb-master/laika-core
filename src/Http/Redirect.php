@@ -46,9 +46,9 @@ class Redirect
     /**
      * Get Method
      * @return string
-     * @return never
+     * @return void
      */
-    public function back(int $code = 302): never
+    public function back(int $code = 302): void
     {
         $this->send($_SERVER['HTTP_REFERER'] ?? $this->host, $code);
     }
@@ -67,9 +67,9 @@ class Redirect
 
     /**
      * Get Method
-     * @return never
+     * @return void
      */
-    public function to(string $to, int $code = 302): never
+    public function to(string $to, int $code = 302): void
     {
         $url = parse_url($to, PHP_URL_HOST);
         if (!$url) {
