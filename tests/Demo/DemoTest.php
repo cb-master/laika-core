@@ -28,6 +28,6 @@ final class DemoTest extends TestCase
     public function testRequest(): void
     {
         $request = Request::instance();
-        $this->assertTrue(Request::isGet(), "Failed to Detect GET Request");
+        $this->assertTrue($request->isGet(), "Failed to Detect GET Request");
     }
 }
