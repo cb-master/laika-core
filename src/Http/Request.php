@@ -57,7 +57,7 @@ class Request
     protected string $method;
 
     /**
-     * @property array $errors Request Validate Errors
+     * @property array $errors Request Validation Errors
      */
     protected array $errors;
 
@@ -67,60 +67,116 @@ class Request
     ##################################################################
 
     /**
+     * Start Instance
+     */
+    public function __construct()
+    {
+        $this->get = $this->purify($_GET ?? []);
+        $this->post = $this->purify($_POST ?? []);
+        $this->files = $_FILES ?? [];
+        $this->rawBody = file_get_contents('php://input');
+        $this->json = $this->purify($this->decode($this->rawBody));
+        $this->method = strtoupper($this->post['_method'] ?? $_SERVER['REQUEST_METHOD'] ?? 'GET');
+        $this->errors = [];
+    }
+
+    /**
+     * Get Instance
+     * @return self
+     */
+    public static function instance(): self
+    {
+        self::$instance ??= new self();
+        return self::$instance;
+    }
+
+    /**
      * Get Method
      * @return string
      */
-    public static function method(): string
+    public function method(): string
     {
         // Define $instance if Not Defined Yet
-        self::getInstance();
-        return self::$instance->method;
+        return $this->method;
     }
 
     /**
      * Get Header Key Values
+     * @return array
+     */
+    public function headers(): array
+    {
+        $headers = [];
+        foreach ($_SERVER as $key => $value) {
+            if (str_starts_with($key, 'HTTP_')) {
+                $headers[strtolower(str_replace('_', '-', substr($key, 5)))] = $value;
+            }
+        }
+        return $headers;
+    }
+
+    /**
+     * Get Header Key Value
      * @param string $key Key name of headers. Example: 'content-type'
      * @return ?string
      */
-    public static function header(string $key): ?string
+    public function header(string $key): ?string
     {
-        // Define $instance if Not Defined Yet
-        self::getInstance();
-        $headerKey = 'HTTP_' . strtoupper(str_replace('-', '_', $key));
-        return $_SERVER[$headerKey] ?? null;
+        return $this->headers()[strtolower($key)] ?? null;
     }
 
     /**
      * Request is POST
      * @return bool
      */
-    public static function isPost(): bool
+    public function isPost(): bool
     {
-        // Define $instance if Not Defined Yet
-        self::getInstance();
-        return self::$instance->method === 'POST';
+        return $this->method === 'POST';
     }
 
     /**
      * Request is GET
      * @return bool
      */
-    public static function isGet(): bool
+    public function isGet(): bool
     {
-        // Define $instance if Not Defined Yet
-        self::getInstance();
-        return self::$instance->method === 'GET';
+        return $this->method === 'GET';
+    }
+
+    /**
+     * Request is PUT
+     * @return bool
+     */
+    public function isPut(): bool
+    {
+        return $this->method === 'PUT';
+    }
+
+    /**
+     * Request is DELETE
+     * @return bool
+     */
+    public function isDelete(): bool
+    {
+        return $this->method === 'DELETE';
+    }
+
+    /**
+     * Request is PATCH
+     * @return bool
+     */
+    public function isPatch(): bool
+    {
+        return $this->method === 'PATCH';
     }
 
     /**
      * Check Request is Ajax
      * @return bool
      */
-    public static function isAjax(): bool
+    public function isAjax(): bool
     {
-        // Define $instance if Not Defined Yet
-        self::getInstance();
-        return strtolower(self::header('X-Requested-With')) === 'xmlhttprequest';
+        return strtolower($this->header('X-Requested-With')) === 'xmlhttprequest';
     }
 
     /**
@@ -129,33 +185,26 @@ class Request
      * @param mixed $default Default is null if not Key Exists
      * @return mixed
      */
-    public static function input(string $key, mixed $default = null): mixed
+    public function input(string $key, mixed $default = null): mixed
     {
-        // Define $instance if Not Defined Yet
-        self::getInstance();
-        return self::$instance->post[$key] ?? self::$instance->get[$key] ?? self::$instance->json[$key] ?? $default;
+        return $this->post[$key] ?? $this->get[$key] ?? $this->json[$key] ?? $default;
     }
 
     /**
      * Get All Request Key & Values
      * @return array
      */
-    public static function all(): array
+    public function all(): array
     {
-        // Define $instance if Not Defined Yet
-        self::getInstance();
-        return array_merge(self::$instance->get, self::$instance->post, self::$instance->json);
+        return array_merge($this->json, $this->post, $this->get);
     }
 
     // Get Selected Key Values
-    public static function only(array $keys): array
+    public function only(array $keys): array
     {
-        // Define $instance if Not Defined Yet
-        self::getInstance();
-
         $result = [];
         foreach ($keys as $key) {
-            $result[$key] = self::input($key, null);
+            $result[$key] = $this->input($key, null);
         }
         return $result;
     }
@@ -165,22 +214,18 @@ class Request
      * @param string $key Key Name of Request
      * @return bool
      */
-    public static function has(string $key): bool
+    public function has(string $key): bool
     {
-        // Define $instance if Not Defined Yet
-        self::getInstance();
-        return array_key_exists($key, self::$instance->post) || array_key_exists($key, self::$instance->get) || array_key_exists($key, self::$instance->json);
+        return array_key_exists($key, $this->post) || array_key_exists($key, $this->get) || array_key_exists($key, $this->json);
     }
 
     /**
      * Get JSON Body
      * @return array
      */
-    public static function json(): array
+    public function json(): array
     {
-        // Define $instance if Not Defined Yet
-        self::getInstance();
-        return self::$instance->json;
+        return $this->json;
     }
 
     /**
@@ -188,22 +233,18 @@ class Request
      * @param ?string $key Key Name of Request File. Null Will Return All Request File Info
      * @return ?array
      */
-    public static function file(?string $key = null): ?array
+    public function file(?string $key = null): ?array
     {
-        // Define $instance if Not Defined Yet
-        self::getInstance();
-        return $key ? (self::$instance->files[$key] ?? []) : self::$instance->files;
+        return $key ? ($this->files[$key] ?? []) : $this->files;
     }
 
     /**
      * Get JSON String
      * @return string
      */
-    public static function raw(): string
+    public function raw(): string
     {
-        // Define $instance if Not Defined Yet
-        self::getInstance();
-        return self::$instance->rawBody;
+        return $this->rawBody;
     }
 
     /**
@@ -211,10 +252,10 @@ class Request
      * @param array $keys Request Keys. Example: ['name', 'password']
      * @return bool
      */
-    public static function validRequestKeys(array $keys): bool
+    public function validRequestKeys(array $keys): bool
     {
         foreach ($keys as $key) {
-            if (!self::has($key)) {
+            if (!$this->has($key)) {
                 return false;
             }
         }
@@ -228,7 +269,7 @@ class Request
     public function hasBlankInput(array $keys): bool
     {
         foreach ($keys as $key) {
-            $value = self::input($key);
+            $value = $this->input($key);
             if ($value === null || $value === '') {
                 return true;
             }
@@ -241,51 +282,26 @@ class Request
      * @param array $customMessages Optional Argument. Example: ['email.required'=>'Email is Required!']
      * @return array
      */
-    public static function validate(array $rules, array $customMessages = []): array
+    public function validate(array $rules, array $customMessages = []): array
     {
-        // Define $instance if Not Defined Yet
-        self::getInstance();
-        self::$instance->errors = Validator::make(self::all(), $rules, $customMessages);
-        return self::$instance->errors;
+        $this->errors = Validator::make($this->all(), $rules, $customMessages);
+        return $this->errors;
     }
 
     /**
      * Request Errors
      * @return array
      */
-    public static function errors(): array
+    public function errors(): array
     {
-        // Define $instance if Not Defined Yet
-        self::getInstance();
-        return self::$instance->errors;
-    }
-
-    ########################################################################
-    /*--------------------------- INTERNAL API ---------------------------*/
-    ########################################################################
-
-    private function __construct()
-    {
-        $this->get = purify($_GET ?? []);
-        $this->post = purify($_POST ?? []);
-        $this->files = $_FILES ?? [];
-        $this->rawBody = file_get_contents('php://input');
-        $this->json = purify($this->decodeJson($this->rawBody));
-        $this->method = strtoupper($this->post['_method'] ?? $_SERVER['REQUEST_METHOD'] ?? 'GET');
-        $this->errors = [];
+        return $this->errors;
     }
 
     /**
-     * Get Request Instance
-     * @return static
+     * Decode Raw Body
+     * @return array
      */
-    private static function getInstance(): static
-    {
-        self::$instance ??= new self();
-        return self::$instance;
-    }
-
-    private function decodeJson(string $rawBody): array
+    public function decode(string $rawBody): array
     {
         $contentType = $_SERVER['CONTENT_TYPE'] ?? '';
         if (str_starts_with(strtolower($contentType), 'application/json')) {
@@ -293,5 +309,19 @@ class Request
             return is_array($decoded) ? $decoded : [];
         }
         return [];
+    }
+
+    // Purify Arry Values
+    /**
+     * @param array $data Array Data to Purify
+     * @return array
+     */
+    public function purify(array $data): array
+    {
+        return array_map(function($val){
+            return is_array($val)
+                ? $this->purify($val)
+                : htmlspecialchars(trim($val), ENT_QUOTES, 'UTF-8');
+        }, $data);
     }
 }

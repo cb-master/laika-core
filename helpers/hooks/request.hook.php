@@ -23,17 +23,17 @@ use Laika\Core\Http\Request;
 ######################################################################
 // Get Request Header
 add_filter('request.header', function(string $key): ?string {
-    return Request::header($key);
+    return Request::instance()->header($key);
 });
 
 // Get Request Input Value
 add_filter('request.input', function(string $key, mixed $default = ''): mixed {
-    return Request::input($key, $default);
+    return Request::instance()->input($key, $default);
 });
 
 // Get Request Values
 add_filter('request.all', function(): array {
-    return Request::all();
+    return Request::instance()->all();
 });
 
 // Check Method Request is Post/Get/Ajax
@@ -41,14 +41,23 @@ add_filter('request.is', function(string $method): bool {
     $method = strtolower($method);
     switch ($method) {
         case 'post':
-            return Request::isPost();
+            return Request::instance()->isPost();
             break;
         case 'get':
-            return Request::isGet();
+            return Request::instance()->isGet();
+            break;
+        case 'put':
+            return Request::instance()->isPut();
+            break;
+        case 'patch':
+            return Request::instance()->isPatch();
+            break;
+        case 'delete':
+            return Request::instance()->isDelete();
             break;
         case 'ajax':
-            return Request::isAjax();
-            break;        
+            return Request::instance()->isAjax();
+            break;
         default:
             return false;
             break;
@@ -60,6 +69,6 @@ add_filter('request.is', function(string $method): bool {
  * @return string
  */
 add_filter('request.error', function(string $key): string{
-    $errors = Request::errors();
+    $errors = Request::instance()->errors();
     return $errors[$key][0] ?? '';
 });

@@ -16,7 +16,7 @@ if (php_sapi_name() !== 'cli' && !defined('APP_PATH')) {
     exit('Direct Access Denied!');
 }
 
-use Laika\Core\{Language, Cookie, Config};
+use Laika\Core\Config;
 
 ####################################################################
 /*------------------------- APP FILTERS --------------------------*/

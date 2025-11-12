@@ -25,6 +25,11 @@ use Laika\Core\Uri;
 class Redirect
 {
     /**
+     * @property ?self $instance
+     */
+    protected static ?self $instance = null;
+
+    /**
      * App Host
      * @var string $host
      */
@@ -44,11 +49,21 @@ class Redirect
     }
 
     /**
+     * Get Instance
+     * @return self
+     */
+    public static function instance(): self
+    {
+        self::$instance ??= new self();
+        return self::$instance;
+    }
+
+    /**
      * Get Method
      * @return string
-     * @return never
+     * @return void
      */
-    public function back(int $code = 302): never
+    public function back(int $code = 302): void
     {
         $this->send($_SERVER['HTTP_REFERER'] ?? $this->host, $code);
     }
@@ -67,9 +82,9 @@ class Redirect
 
     /**
      * Get Method
-     * @return never
+     * @return void
      */
-    public function to(string $to, int $code = 302): never
+    public function to(string $to, int $code = 302): void
     {
         $url = parse_url($to, PHP_URL_HOST);
         if (!$url) {

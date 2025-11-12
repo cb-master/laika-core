@@ -24,7 +24,7 @@ use Laika\Model\DB;
 class Option
 {
     // Table Name
-    private static $table = 'options';
+    private static string $table = 'options';
 
     // Option Key Column
     private static string $key = 'opt_key';

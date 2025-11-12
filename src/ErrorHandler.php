@@ -99,7 +99,7 @@ class ErrorHandler
         }
 
         if (!empty(self::$exceptions)) {
-            Response::code(500);
+            Response::instance()->code(500);
             self::$debug ? self::errorHtml() : self::internalErrorHtml();
             return;
         }

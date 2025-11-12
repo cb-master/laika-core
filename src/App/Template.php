@@ -19,11 +19,21 @@ if (php_sapi_name() !== 'cli' && !defined('APP_PATH')) {
     exit('Direct Access Denied!');
 }
 
-use Laika\Template\Template as Engine;
+use Twig\{Loader\FilesystemLoader as Engine, Environment, TwigFilter};
 use Laika\Core\{Directory, Local};
 
-class Template extends Engine
+class Template
 {
+    /**
+     * @var object $twig
+     */
+    protected object $twig;
+
+    /**
+     * @var array $vars
+     */
+    protected array $vars = [];
+
     /**
      * @var ?string $templateDirectory Template Directory
      */
@@ -36,26 +46,63 @@ class Template extends Engine
 
     public function __construct(?string $templateSubDirectory = null, ?string $cacheSubDirectory = null)
     {
-        // Make Template Direcory
-        $templateSubDirectory = $templateSubDirectory ? '/' . trim($templateSubDirectory, '/') : '';
-        $this->templateDirectory = APP_PATH . "/lf-templates{$templateSubDirectory}";
-        Directory::make($this->templateDirectory);
-
-        // Make Template Cache Direcory
-        $cacheSubDirectory = $cacheSubDirectory ? '/' . trim($cacheSubDirectory, '/') : '';
-        $this->cacheDirectory = APP_PATH . "/lf-cache{$cacheSubDirectory}";
-        Directory::make($this->cacheDirectory);
+        // Ensure Template & Cache Paths
+        $this->ensureTemplatePath($templateSubDirectory);
+        $this->ensureCachePath($cacheSubDirectory);
 
         // Run Template Engine
-        parent::__construct($this->templateDirectory, $this->cacheDirectory);
+        $engine = new Engine($this->templateDirectory);
+        $this->twig = new Environment($engine, [
+            'debug' =>  option('debug', false),
+            'cache' =>  $this->cacheDirectory
+        ]);
 
-        // Set Template Required Vars
-        $this->assign('app_info', Env::get('app|info'));
+        // Assign Template Default Vars & Filters
+        $this->assign('app', Env::get('app|info'));
         $this->assign('local', Local::get());
+        $this->addFilter('filter', 'apply_filter');
     }
 
     public function view(string $name): string
     {
-        return $this->render($name);
+        return $this->twig->render("{$name}.twig", $this->vars);
+    }
+
+    /**
+     * Assign Variable
+     * @param string|array $key Key Name or Array of Key, Value Pair
+     * @param mixed $value Key Name or Array of Key, Value Pair
+     */
+    public function assign(string|array $key, mixed $value = null): void
+    {
+        if (is_string($key)) {
+            $key = [$key => $value];
+        }
+        $this->vars = array_merge($this->vars, $key);
+    }
+
+    public function addFilter(string $name, $callable): void
+    {
+        $this->twig->addFilter(new TwigFilter($name, $callable));
+    }
+
+    #################################################################################
+    /*-------------------------------- PRIVATE API --------------------------------*/
+    #################################################################################
+
+    // Ensure Template Path
+    private function ensureTemplatePath(?string $subdir = null): void
+    {
+        $subdir = $subdir ? trim($subdir, '/') : '';
+        $this->templateDirectory = is_dir($subdir) ? realpath($subdir) : APP_PATH . "/lf-templates/{$subdir}";
+        Directory::make($this->templateDirectory);
+    }
+
+    // Ensure Template Path
+    private function ensureCachePath(?string $subdir = null): void
+    {
+        $subdir = $subdir ? trim($subdir, '/') : '';
+        $this->cacheDirectory = is_dir($subdir) ? realpath($subdir) : APP_PATH . "/lf-cache/{$subdir}";
+        Directory::make($this->cacheDirectory);
     }
 }
