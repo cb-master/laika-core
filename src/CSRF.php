@@ -63,7 +63,7 @@ class CSRF
     {
         $this->for = $for ? strtoupper($for) : 'APP';
         $this->key = $key ? strtolower($key) : 'token';
-        $this->header = "{$this->for}_CSRF_TOKEN";
+        $this->header = "X-Laika-Token";
         $this->lifetime = (int) option('csrf.lifetime', 300); // Default Lifetime is 300
         $this->time = (int) option('start.time', 300);
         $this->generate();
