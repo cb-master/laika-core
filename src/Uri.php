@@ -23,9 +23,9 @@ class Uri
 {
     /**
      * Singleton Object
-     * @var ?object $instance
+     * @var Uri $instance
      */
-    private ?object $instance;
+    private static Uri $instance;
 
     /**
      * Scheme
@@ -89,9 +89,9 @@ class Uri
 
     /**
      * Singleton Instance
-     * @return self
+     * @return Uri
      */
-    public static function instance(): self
+    public static function instance(): Uri
     {
         self::$instance ??= new self();
         return self::$instance;

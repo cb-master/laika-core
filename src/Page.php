@@ -20,15 +20,15 @@ if (php_sapi_name() !== 'cli' && !defined('APP_PATH')) {
 class Page
 {
     /**
-     * @var ?object $instance
+     * @var Page $instance
      */
-    private static ?object $instance;
+    private static Page $instance;
 
     /**
      * Total Results
      * @var int $totalResults
      */
-    private int $totalResults;
+    private int $totalElements;
 
     /**
      * Total Pages
@@ -40,21 +40,21 @@ class Page
     /* ------------------------ PUBLIC API ------------------------ */
     ##################################################################
     /**
-     * Total Results
-     * @param ?int $totalResults Default is null
+     * Total Elements
+     * @param ?int $totalElements Default is null
      */
-    public function __construct(?int $totalResults = null)
+    public function __construct(?int $totalElements = null)
     {
-        $this->totalResults = (int) $totalResults < 1  ? 1 : (int) $totalResults;
-        $this->totalPages = (int) ceil($this->totalResults / (int) option('data.limit', 20));
+        $this->totalElements = (int) $totalElements < 1  ? 1 : (int) $totalElements;
+        $this->totalPages = (int) ceil($this->totalElements / (int) option('data.limit', 20));
     }
 
     /**
      * Singleton Instance
      * @param ?int $totalResults Default is null
-     * @return self
+     * @return Page
      */
-    public static function instance(?int $totalResults = null): self
+    public static function instance(?int $totalResults = null): Page
     {
         self::$instance ??= new self($totalResults);
         return self::$instance;
@@ -64,7 +64,7 @@ class Page
      * Total Pages Exists
      * @return int
      */
-    public function pages(): int
+    public function totalPages(): int
     {
         return $this->totalPages;
     }
@@ -74,9 +74,9 @@ class Page
      * @param int $totalResults
      * @return int
      */
-    public function total(): int
+    public function totalElements(): int
     {
-        return $this->totalResults;
+        return $this->totalElements;
     }
 
     /**
