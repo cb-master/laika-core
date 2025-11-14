@@ -24,24 +24,70 @@ use Laika\Session\Session;
 
 class CSRF
 {
-    // CSRF Token Lifetime
+    /**
+     * @var CSRF $instance CSRF Singleton Instance
+     */
+    private static CSRF $instance;
+
+    /**
+     * @var int $lifetime CSRF Token Lifetime
+     */
     protected int $lifetime;
 
-    // CSRF For
+    /**
+     * @var string $for CSRF Session For
+     */
     protected string $for;
 
-    // Session Name
+    /**
+     * @var string $key Request Key
+     */
     protected string $key;
 
     /**
-     * @param array $config Default is []. Accepted Keys: ['key', 'for']. Example: ['key'=>'csrf', 'for'=>'admin']
+     * @var string $header Header Key
      */
-    public function __construct(array $config = [])
+    protected string $header;
+
+    /**
+     * @var int $time App Start Time
+     */
+    protected int $time;
+
+    /**
+     * Initiate CSRF Object
+     * @param ?string $for Default is null. In null 'APP' will be placed as argument
+     * @param ?string $key Default is null. In null 'token' will be placed as argument
+     */
+    public function __construct(?string $for = null, ?string $key = null)
     {
-        $this->key = $config['key'] ?? 'csrf';
-        $this->for = strtoupper($config['for'] ?? 'APP');
+        $this->for = $for ? strtoupper($for) : 'APP';
+        $this->key = $key ? strtolower($key) : 'token';
+        $this->header = "{$this->for}_CSRF_TOKEN";
         $this->lifetime = (int) option('csrf.lifetime', 300); // Default Lifetime is 300
+        $this->time = (int) option('start.time', 300);
         $this->generate();
+    }
+
+    /**
+     * Singleton Instance
+     * @param ?int $totalResults Default is null
+     * @param ?string $for Default is null. In null 'APP' will be placed as argument
+     * @param ?string $key Default is null. In null 'token' will be placed as argument
+     * @return CSRF
+     */
+    public static function instance(?string $for = null, ?string $key = null): CSRF
+    {
+        self::$instance ??= new self($for, $key);
+        // Set Session For
+        if ($for) {
+            self::$instance->for = strtoupper($for);
+        }
+        // Set Request Key
+        if ($key) {
+            self::$instance->key = strtolower($key);
+        }
+        return self::$instance;
     }
 
     /**
@@ -53,13 +99,14 @@ class CSRF
         $csrf = Session::get($this->key, $this->for);
         // Generate CSRF Token if Not Exists
         if (
-            !isset($csrf['created'], $csrf['token']) ||
-            !$csrf['created'] ||
-            !$csrf['token'] ||
-            ((int) option('start.time', 300) - $csrf['created'] > $this->lifetime)
+            !isset($csrf['created'], $csrf['token']) || // Check Token & Created Time Exists
+            !$csrf['created'] || // Check CSRF Created Time is Valid
+            !$csrf['token'] || // Check CSRF Token is Valid
+            ((int) option('start.time', 300) - $csrf['created'] > $this->lifetime) // Check Token is Not Expired
         ) {
             return $this->reset();
         }
+        $this->header($csrf['token']);
         return $csrf['token'];
     }
 
@@ -84,9 +131,10 @@ class CSRF
     {
         $arr = [
             'created'   =>  (int) option('start.time', 300),
-            'token'     =>  bin2hex(random_bytes(64))
+            'token'     =>  bin2hex(random_bytes(32))
         ];
         Session::set($this->key, $arr, $this->for);
+        $this->header($arr['token']);
         return $arr['token'];
     }
 
@@ -113,5 +161,17 @@ class CSRF
         $existing_token = $this->get();
         $this->reset();
         return hash_equals($request_token, $existing_token);
+    }
+
+    ##################################################################
+    /*------------------------ INTERNAL API ------------------------*/
+    ##################################################################
+    /**
+     * Set Heder Token Key
+     * @return void
+     */
+    private function header(string $value): void
+    {
+        Http\Response::instance()->setHeader([$this->header => $value]);
     }
 }
