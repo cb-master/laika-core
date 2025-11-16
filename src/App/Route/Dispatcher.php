@@ -79,7 +79,6 @@ class Dispatcher
         );
 
         // Run Middlewares -> Controller
-        $response = Invoke::middleware($middlewares, $route['controller'], $params);
         try {
             $response = Invoke::middleware($middlewares, $route['controller'], $params);
         } catch (\Throwable $e) {
