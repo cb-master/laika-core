@@ -22,9 +22,9 @@ if (php_sapi_name() !== 'cli' && !defined('APP_PATH')) {
 class Response
 {
     /**
-     * @property ?self $instance
+     * @property Response $instance
      */
-    protected static ?self $instance = null;
+    private static Response $instance;
 
     /**
      * Default Headers
@@ -39,7 +39,7 @@ class Response
         $this->headers = [
             "Access-Control-Allow-Origin"       =>  "*",
             "Access-Control-Allow-Methods"      =>  "GET, POST",
-            "Access-Control-Allow-Headers"      =>  "Authorization, Origin, X-Requested-With, Content-Type, Accept",
+            "Access-Control-Allow-Headers"      =>  "Authorization, Origin, X-Requested-With, Content-Type, Accept, X-Laika-Token",
             "Access-Control-Allow-Credentials"  =>  "true",
             "X-Powered-By"                      =>  "Laika",
             "X-Frame-Options"                   =>  "sameorigin",
@@ -53,9 +53,9 @@ class Response
 
     /**
      * Get Instance
-     * @return self
+     * @return Response
      */
-    public static function instance(): self
+    public static function instance(): Response
     {
         self::$instance ??= new self();
         return self::$instance;
