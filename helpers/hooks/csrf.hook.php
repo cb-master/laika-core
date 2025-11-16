@@ -23,9 +23,10 @@ use Laika\Core\CSRF;
 #####################################################################
 /**
  * CSRF Token HTL Field
+ * @param ?string $for Default is null. Example: 'app' or 'admin'
  * @return string
  */
-add_filter('csrf.field', function (array $config = []): string{
-    $obj = new CSRF($config);
+add_filter('csrf.field', function (?string $for = null): string{
+    $obj = CSRF::instance(for:$for);
     return $obj->field();
 });

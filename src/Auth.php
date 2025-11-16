@@ -21,6 +21,7 @@ if (php_sapi_name() !== 'cli' && !defined('APP_PATH')) {
 
 use Laika\Model\ConnectionManager;
 use Laika\Session\Session;
+use Laika\Model\Schema;
 use PDO;
 
 class Auth
@@ -57,9 +58,20 @@ class Auth
     {
         $this->for = strtolower($for);
         $this->pdo = ConnectionManager::get();
-        $this->table = "{$this->for}_sessions";
+        $this->table = "{$this->for}sessions";
         $this->event = Session::get($this->cookie, $this->for);
         $this->time = (int) option('start.time', time());
+        // Create Table if Does Not Exists
+        Schema::setConnection();
+        Schema::create($this->table, function($e){
+            $e->string('event', 50)
+                ->mediumText('data')
+                ->integer('expire')
+                ->integer('created')
+                ->primary('event')
+                ->index('expire');
+        });
+
     }
 
     /**
@@ -82,7 +94,7 @@ class Auth
         $this->user = $user;
 
         // Get Event ID
-        $this->event = bin2hex(random_bytes(32));
+        $this->event = $this->generateEventKey();
         // Set Expire Time
         $expire = $this->time + $this->ttl;
         // Make SQL
@@ -154,5 +166,22 @@ class Auth
         $stmt = $this->pdo->prepare("DELETE FROM {$this->table} WHERE event = :event");
         $stmt->execute([':event' => $this->event]);
         Session::pop($this->cookie, $this->for);
+    }
+
+    /**
+     * Generate Event Key
+     * @return string
+     */
+    private function generateEventKey(): string
+    {
+        $uid = uniqid('event-').'-'.uniqid().'-'.Config::get('env', 'start.time', time());
+        // Check Already Exist & Return
+        $stmt = $this->pdo->prepare("SELECT event FROM {$this->table} WHERE event = :event LIMIT 1");
+        $stmt->execute([':event' => $this->event]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        if (!$row) {
+            return $uid;
+        }
+        return $this->generateEventKey();
     }
 }

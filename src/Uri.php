@@ -22,6 +22,12 @@ if (php_sapi_name() !== 'cli' && !defined('APP_PATH')) {
 class Uri
 {
     /**
+     * Singleton Object
+     * @var ?object $instance
+     */
+    private static ?object $instance;
+
+    /**
      * Scheme
      * @var string
      */
@@ -80,6 +86,16 @@ class Uri
     ##############################################################################
     //------------------------------- PUBLIC API------------------------------- //
     ##############################################################################
+
+    /**
+     * Singleton Instance
+     * @return self
+     */
+    public static function instance(): self
+    {
+        self::$instance ??= new self();
+        return self::$instance;
+    }
 
     /**
      * Get Current URL

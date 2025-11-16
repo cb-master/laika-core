@@ -49,12 +49,22 @@ class Dispatcher
 
             foreach (array_reverse($fallbacks) as $key => $callable){
                 if (str_starts_with(Url::normalizeFallbackKey($requestUrl), $key)) {
-                    echo Invoke::controller($callable, $params);
+                    try {
+                        echo Invoke::controller($callable, $params);
+                    } catch (\Throwable $e) {
+                        report_bug($e);
+                    }
+                    // echo Invoke::controller($callable, $params);
                     return;
                 }
             }
             /*---- Execute Fallback ----*/
-            echo _404::show();
+            try {
+                echo _404::show();
+            } catch (\Throwable $e) {
+                report_bug($e);
+            }
+            // echo _404::show();
             return;
         }
 
@@ -70,6 +80,11 @@ class Dispatcher
 
         // Run Middlewares -> Controller
         $response = Invoke::middleware($middlewares, $route['controller'], $params);
+        try {
+            $response = Invoke::middleware($middlewares, $route['controller'], $params);
+        } catch (\Throwable $e) {
+            report_bug($e);
+        }
 
         // Run Afterware
         $afterwares = array_merge(
@@ -78,7 +93,12 @@ class Dispatcher
             $route['afterwares']['route']
         );
 
-        echo empty($afterwares) ? $response : Invoke::afterware($afterwares, $response, $params);
+        try {
+            echo empty($afterwares) ? $response : Invoke::afterware($afterwares, $response, $params);
+        } catch (\Throwable $e) {
+            report_bug($e);
+        }
+        return;
     }
 
     /**

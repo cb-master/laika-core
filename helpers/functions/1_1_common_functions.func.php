@@ -16,7 +16,15 @@ if (php_sapi_name() !== 'cli' && !defined('APP_PATH')) {
     exit('Direct Access Denied!');
 }
 
-use Laika\Core\{App\Router, Config, Filter, Uri, Option};
+use Laika\Core\Exceptions\HttpException;
+use Laika\Core\Exceptions\Handler;
+use Laika\Core\Http\ApiResponse;
+use Laika\Core\Http\Response;
+use Laika\Core\App\Router;
+use Laika\Core\Config;
+use Laika\Core\Filter;
+use Laika\Core\Option;
+use Laika\Core\Uri;
 
 // Dump Data & Die
 /**
@@ -152,4 +160,41 @@ function named(string $name, array $params = [], bool $url = false): string
 function showdate(int $unixtime): string
 {
     return apply_filter('date.show', $unixtime);
+}
+
+/**
+ * Throw Exception and Abort
+ * @param int $code Error Code
+ * @param string $message Error Message
+ * @return void
+ */
+function abort(int $code, string $message = ''): void
+{
+    throw new HttpException($code, $message ?: Response::instance()->codes()[$code]);
+}
+
+/**
+ * Report Error
+ * @return void
+ */
+function report_bug(Throwable $th): void
+{
+    $handler = new Handler();
+    $handler->handle($th);
+}
+
+/**
+ * API Response
+ */
+function response()
+{
+    return new class {
+        public function success(array $data = [], string $message = 'Success', int $status = 200, array $meta = []) {
+            ApiResponse::success($data, $message, $status, $meta);
+        }
+
+        public function error(string $message = 'Error', int $status = 400, array $errors = [], array $meta = []) {
+            ApiResponse::error($message, $status, $errors, $meta);
+        }
+    };
 }
