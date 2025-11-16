@@ -35,7 +35,7 @@ class Model extends BaseModel
      */
     public function limit(int|string $page = 1, array $where = []): array
     {
-        $limit = (int) option('app.limit', 20);
+        $limit = (int) option('data.limit', 20);
         return $this->db
             ->table($this->table)
             ->where($where)
