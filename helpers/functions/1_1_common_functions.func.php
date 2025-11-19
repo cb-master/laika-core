@@ -145,9 +145,9 @@ function host(): string
  */
 function named(string $name, array $params = [], bool $url = false): string
 {
-    $path = Router::url($name, $params);
+    $path = trim(Router::url($name, $params), '/');
     if ($url) {
-        return trim(host(), '/') . $path;
+        return trim(host(), '/') . "/{$path}";
     }
     return $path;
 }
