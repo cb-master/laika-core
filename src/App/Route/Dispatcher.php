@@ -13,14 +13,23 @@ declare(strict_types=1);
 
 namespace Laika\Core\App\Route;
 
-use Laika\Core\{Config, Uri, Local, Token, App\Env, App\Connect, Http\Response};
+use Laika\Core\Http\Response;
+use Laika\Core\App\Connect;
+use Laika\Core\App\Env;
+use Laika\Core\Local;
+use Laika\Core\Token;
+use RuntimeException;
+use Laika\Core\Uri;
 
 class Dispatcher
 {
     public static function dispatch(): void
     {
         // Set App Info Environment
-        Env::set('app|info', Config::get('app'));
+        Env::set('app|info', apply_filter('config.app'));
+
+        // Create Required Directories
+        self::createDirectories();
 
         // Get Request Url
         $uri = new Uri();
@@ -112,13 +121,36 @@ class Dispatcher
         $token = new Token();
         $uri = new Uri();
         Response::instance()->setHeader([
-            "Request-Time"  =>  option('start.time', time()),
-            "App-Provider"  =>  Config::get('app', 'name', 'Laika Framework'),
+            "Request-Time"  =>  apply_filter('config.app', 'start.time', time()),
+            "App-Provider"  =>  apply_filter('config.app', 'name', 'Laika Framework'),
             "Authorization" =>  $token->generate([
                 'uid'       =>  mt_rand(100001, 999999),
                 'requestor' =>  $uri->base()
             ])
         ]);
+        return;
+    }
+
+    /**
+     * Create Required Directories
+     * @return void
+     */
+    private static function createDirectories(): void
+    {
+        $dirs = [
+            APP_PATH . '/Controller',
+            APP_PATH . '/Model',
+            APP_PATH . '/Middleware',
+            APP_PATH . '/Afterware',
+        ];
+
+        foreach ($dirs as $dir) {
+            if (!is_dir($dir)) {
+                if (!mkdir($dir, 0755, true)) {
+                    throw new RuntimeException("Failed to Create Directory: {$dir}");
+                }
+            }
+        }
         return;
     }
 }
