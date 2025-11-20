@@ -52,7 +52,7 @@ class Invoke
 
                     // Check handle Method Exists
                     if (!method_exists($obj, 'handle')) {
-                        report_bug(new RuntimeException("'handle' Method Doesn't Exists in {$middleware}"));
+                        report_bug(new RuntimeException("Method Not Found: {$middleware}::handle()"));
                     }
                     try {
                         return $obj->handle($next, $params);
@@ -102,7 +102,7 @@ class Invoke
                     $obj = new $afterware;
 
                     if (!method_exists($obj, 'terminate')) {
-                        report_bug(new RuntimeException("'terminate' Method Doesn't Exists in {$afterware}"));
+                        report_bug(new RuntimeException("Method Not Found: {$afterware}::terminate()"));
                     }
 
                     // Execute the current afterware, passing response and chain
@@ -141,11 +141,11 @@ class Invoke
             [$controller, $method] = $handler;
             // Check Controller Exists
             if (!class_exists($controller)) {
-                report_bug(new RuntimeException("Controller '{$controller}' Doesn't Exists"));
+                report_bug(new RuntimeException("Invalid Controller: " . print_r($handler, true)));
             }
             // Check Method Exists
             if (!method_exists($controller, $method)) {
-                report_bug(new RuntimeException("Controller Method '{$method}' Doesn't Exists"));
+                report_bug(new RuntimeException("Invalid Method: " . print_r($handler, true)));
             }
             // Call Controller
             $obj = new $controller();
@@ -161,7 +161,7 @@ class Invoke
         if (is_object($handler)) {
             // Check Method Exists
             if (!method_exists($handler, 'index')) {
-                report_bug(new RuntimeException("Controller Method Doesn't Exists: " . get_class($handler) . "::index()"));
+                report_bug(new RuntimeException("Invalid Method: " . get_class($handler) . "::index()"));
             }
             // Call Controller
             $reflection = new Reflection([$handler, 'index'], $args);
@@ -177,17 +177,17 @@ class Invoke
             $parts = explode('@', $handler);
             $controller = $parts[0];
             if (!isset($parts[1])) {
-                report_bug(new RuntimeException("'{$handler}' Containes Invalid Method!"));
+                report_bug(new RuntimeException("Invalid Controller: {$handler}"));
             }
             [$controller, $method] = explode('@', $handler);
             $controller = "Laika\\App\\Controller\\{$controller}";
             // Check Controller Exists
             if (!class_exists($controller)) {
-                report_bug(new RuntimeException("Controller '{$controller}' Doesn't Exists"));
+                report_bug(new RuntimeException("Invalid Controller: {$handler}"));
             }
             // Check Method Exists
             if (!method_exists($controller, $method)) {
-                report_bug(new RuntimeException("Method '{$method}' Doesn't Exists in Controller '{$controller}'"));
+                report_bug(new RuntimeException("Invalid Method: {$handler}"));
             }
             // Call Controller
             $obj = new $controller();
