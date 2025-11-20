@@ -44,10 +44,6 @@ class Dispatcher
         // Load Local
         array_key_exists($uri->segment(1), Handler::getGroups()) ? Local::load($uri->segment(1)) : Local::load();
 
-        // App Connect
-        if (!str_starts_with($res['route'] ?? '', '/resource')) {
-            self::connect();
-        }
         // Execute Fallback For Invalid Route
         if ($res['route'] === null) {
 
@@ -77,6 +73,11 @@ class Dispatcher
             return;
         }
 
+        // App Connect
+        if (!str_starts_with($res['route'] ?? '', '/resource')) {
+            self::connect();
+        }
+        
         $routes = Handler::getRoutes(Url::method());
         $route = $routes[$res['route']];
 
