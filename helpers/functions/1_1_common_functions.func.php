@@ -130,6 +130,17 @@ function option(string $key, mixed $default = null): mixed
 }
 
 /**
+ * Match Option Value Types as Boolean
+ * @param string $key Option Key
+ * @return bool
+ */
+function option_as_bool(string $key): bool
+{
+    $value = option($key, false);
+    return is_bool($value) ? $value : (bool) preg_match('/^(yes|true|on|1)$/i', $value);
+}
+
+/**
  * Host Path
  * @return string Return Host Path. Example: http://example.com or http://example.com/path if app hosted in path
  */
@@ -197,4 +208,16 @@ function response()
             ApiResponse::error($message, $status, $errors, $meta);
         }
     };
+}
+
+/**
+ * Config Obejct
+ * @param string $name Config Name. Rrequired Argument. Example: app, database etc.
+ * @param ?string $key Config Key. Optional Argument. Example: name, version etc.
+ * @param mixed $default Default Value if no value found. Optional Argument.
+ * @return mixed
+ */
+function config(string $name, ?string $key = null, mixed $default = null): mixed
+{
+    return Config::get($name, $key, $default);
 }

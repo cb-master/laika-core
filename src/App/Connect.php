@@ -21,7 +21,6 @@ if (php_sapi_name() !== 'cli' && !defined('APP_PATH')) {
 
 use Laika\Model\ConnectionManager;
 use Laika\Session\SessionManager;
-use Laika\Core\Config;
 
 class Connect
 {
@@ -52,7 +51,7 @@ class Connect
     private static function setDb(): void
     {
         try {
-            $configs = Config::get('database', default:[]);
+            $configs = config('database', null, []);
             foreach ($configs as $name => $config) {
                 ConnectionManager::add($config, $name);
             }
@@ -77,9 +76,8 @@ class Connect
     private static function setSession(): void
     {
         $session_config = [];
-        $dbsession = option('dbsession', 'no');
-        if ($dbsession == 'yes') {
-            $session_config = ConnectionManager::has('default') ? ConnectionManager::get() : [];
+        if (option_as_bool('dbsession') && ConnectionManager::has('default')) {
+            $session_config = ConnectionManager::get();
         }
         SessionManager::config($session_config);
         return;
