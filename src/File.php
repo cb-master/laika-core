@@ -84,7 +84,10 @@ class File
      */
     public function mimeType(): string|false
     {
-        return mime_content_type($this->file);
+        $finfo = finfo_open(FILEINFO_MIME_TYPE);
+        $mime = finfo_file($finfo, $this->file);
+        finfo_close($finfo);
+        return $mime;
     }
 
     /**
@@ -127,10 +130,19 @@ class File
     ## --------------------- BASIC FILE OPERATION --------------------- ##
     ######################################################################
     /**
-     * Read File Content
+     * File Output Buffer
+     * @return void
+     */
+    public function read(): void
+    {
+        readfile($this->file);
+    }
+
+    /**
+     * Get File Content
      * @return string|false
      */
-    public function read(): string|false
+    public function content(): string|false
     {
         return file_get_contents($this->file);
     }

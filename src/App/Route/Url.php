@@ -13,8 +13,17 @@ declare(strict_types=1);
 
 namespace Laika\Core\App\Route;
 
+use Laika\Core\App\Router;
+use Laika\Core\Directory;
+use Laika\Core\File;
+
 class Url
 {
+    /**
+     * @var string $resourceSlug
+     */
+    private static string $resourceSlug = '/resource';
+
     /**
      * Normalize Uri
      * @param string $uri Uri to Normalize
@@ -87,5 +96,56 @@ class Url
             'route'     =>  null,
             'params'    =>  []
         ];
+    }
+
+    /**
+     * Load URL Routes From File
+     * @return void
+     */
+    public static function LoadRoutes(): void
+    {
+        // Load Routes
+        $routes = Directory::files(APP_PATH . '/lf-routes', 'php');
+        array_map(function ($route) { require_once $route; }, $routes);
+        // Register Resource Route
+        self::RegisterResource();
+        return;
+    }
+
+    /**
+     * Get Resource Slug Name
+     * @return string
+     */
+    public static function ResourceSlug(?string $name = null): string
+    {
+        if ($name !== null) {
+            self::$resourceSlug = '/'.trim($name, '/');
+        }
+        return self::$resourceSlug;
+    }
+
+    /**
+     * Register Resource
+     * @return void
+     */
+    private static function RegisterResource(): void
+    {
+        Router::get(self::$resourceSlug.'/{name:.+}', function($name) {
+            // Trim leading/trailing slashes
+            $path = trim($name, '/');
+            // Get Asset File Path
+            $file = realpath(APP_PATH."/lf-templates/{$path}") ?: APP_PATH . "/lf-assets/{$path}";
+            if(!is_file($file)){
+                http_response_code(404);
+                return;
+            }
+            // Read File
+            $obj = new File($file);
+            // Set Content Type
+            header("Content-Type: {$obj->mimeType()}");
+            // Set Output Buffer
+            $obj->read();
+            return;
+        })->name('resource');
     }
 }

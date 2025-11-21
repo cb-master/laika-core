@@ -88,10 +88,10 @@ class Config
         $name   =   strtolower($name);
         $key    =   strtolower($key);
 
-        $file = "{$obj->path}/{$name}.php";
+        $file = new File("{$obj->path}/{$name}.php");
 
-        if (!is_file($file)) {
-            return false;
+        if (!$file->exists()) {
+            throw new \RuntimeException("Config File '{$name}' Does Not Exist.");
         }
 
         // Ensure config exists in memory
@@ -105,9 +105,10 @@ class Config
         // Rebuild file content with short array syntax
         $content = self::make($obj->config[$name]);
 
-        file_put_contents($file, $content);
-
-        return $value;
+        if (!$file->write($content)) {
+            throw new \RuntimeException("Config Write Failed: '{$name}'");
+        }
+        return true;
     }
 
     // Check Name & Key Config Exists
@@ -118,13 +119,13 @@ class Config
      */
     public static function has(string $name, ?string $key = null): bool
     {
-        $obj    =   $obj = self::getInstance();
-        $name   =   strtolower($name);
-        if ($key) {
+        $obj = $obj = self::getInstance();
+        $name = strtolower($name);
+        if ($key !== null) {
             $key = strtolower($key);
             return isset($obj->config[$name][$key]) && $obj->config[$name][$key];
         }
-        return isset($obj->config[$name]) && !empty($obj->config[$name]);
+        return isset($obj->config[$name]);
     }
 
     // Delete a Config Key
@@ -139,10 +140,10 @@ class Config
         $name   =   strtolower($name);
         $key    =   strtolower($key);
 
-        $file = "{$obj->path}/{$name}.php";
+        $file = new File("{$obj->path}/{$name}.php");
 
-        if (!is_file($file)) {
-            return false;
+        if (!$file->exists()) {
+            throw new \RuntimeException("Config File '{$name}' Does Not Exist.");
         }
 
         // Ensure config exists in memory
@@ -156,7 +157,10 @@ class Config
         // Rebuild file content with short array syntax
         $content = self::make($obj->config[$name]);
 
-        return (bool) file_put_contents($file, $content);
+        if (!$file->write($content)) {
+            throw new \RuntimeException("Config Write Failed: '{$name}'");
+        }
+        return true;
     }
 
     // Create A New Config File
@@ -167,22 +171,26 @@ class Config
      */
     public static function create(string $name, array $data): bool
     {
-        $obj = $obj = self::getInstance();
+        $obj = self::getInstance();
         $name = trim(strtolower($name));
 
         $file = $obj->path . "/{$name}.php";
 
         // Check File Already Exist
-        if (is_file($file)) {
-            return false;
+        $fileObj = new File($file);
+        if ($fileObj->exists()) {
+            throw new \RuntimeException("Config File '{$name}' Already Exists.");
         }
 
         $obj->config[$name] = $data;
 
         // Make Array Values
         $content = self::make($data);
-
-        return (bool) file_put_contents($file, $content);
+        // Create Config File
+        if (!$fileObj->write($content)) {
+            throw new \RuntimeException("Config Write Failed: {$name}");
+        }
+        return true;
     }
 
     ########################################################################################
