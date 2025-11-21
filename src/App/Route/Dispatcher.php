@@ -13,9 +13,11 @@ declare(strict_types=1);
 
 namespace Laika\Core\App\Route;
 
+use Laika\Core\Exceptions\Handler as ErrorHandler;
 use Laika\Core\Http\Response;
-use Laika\Core\App\Connect;
+use Laika\Core\Directory;
 use Laika\Core\App\Env;
+use Laika\Core\Config;
 use Laika\Core\Local;
 use Laika\Core\Token;
 use RuntimeException;
@@ -25,11 +27,8 @@ class Dispatcher
 {
     public static function dispatch(): void
     {
-        // Set App Info Environment
-        Env::set('app|info', apply_filter('config.app'));
-
-        // Create Required Directories
-        self::createDirectories();
+        // Pre Dispatch Tasks
+        self::PreDispatcher();
 
         // Get Request Url
         $uri = new Uri();
@@ -59,7 +58,6 @@ class Dispatcher
                     } catch (\Throwable $e) {
                         report_bug($e);
                     }
-                    // echo Invoke::controller($callable, $params);
                     return;
                 }
             }
@@ -69,15 +67,14 @@ class Dispatcher
             } catch (\Throwable $e) {
                 report_bug($e);
             }
-            // echo _404::show();
             return;
         }
 
-        // App Connect
-        if (!str_starts_with($res['route'] ?? '', '/resource')) {
-            self::connect();
+        // Add Additional Headers if Not Resource Route
+        if (!str_starts_with($res['route'] ?? '', Url::ResourceSlug())) {
+            self::RegisterAdditionalHeaders();
         }
-        
+        // Get Matched Route Info
         $routes = Handler::getRoutes(Url::method());
         $route = $routes[$res['route']];
 
@@ -114,19 +111,16 @@ class Dispatcher
      * Connect App
      * @return void
      */
-    private static function connect(): void
+    private static function RegisterAdditionalHeaders(): void
     {
-        // Connect App DB & Session
-        Connect::start();
         // Set Headers
         $token = new Token();
-        $uri = new Uri();
         Response::instance()->setHeader([
             "Request-Time"  =>  apply_filter('config.app', 'start.time', time()),
             "App-Provider"  =>  apply_filter('config.app', 'name', 'Laika Framework'),
             "Authorization" =>  $token->generate([
                 'uid'       =>  mt_rand(100001, 999999),
-                'requestor' =>  $uri->base()
+                'requestor' =>  Uri::instance()->base()
             ])
         ]);
         return;
@@ -136,13 +130,13 @@ class Dispatcher
      * Create Required Directories
      * @return void
      */
-    private static function createDirectories(): void
+    private static function CreateDirectories(): void
     {
         $dirs = [
-            APP_PATH . '/Controller',
-            APP_PATH . '/Model',
-            APP_PATH . '/Middleware',
-            APP_PATH . '/Afterware',
+            APP_PATH . '/lf-app/Controller',
+            APP_PATH . '/lf-app/Model',
+            APP_PATH . '/lf-app/Middleware',
+            APP_PATH . '/lf-app/Afterware',
         ];
 
         foreach ($dirs as $dir) {
@@ -152,6 +146,62 @@ class Dispatcher
                 }
             }
         }
+        return;
+    }
+
+    /**
+     * Create Secret Key File if Not Exist
+     * @return void
+     */
+    private static function CreateSecretKey(): void
+    {
+        if(!Config::has('secret')) {
+            Config::create('secret', ['key'=>bin2hex(random_bytes(64))]);
+        }
+        
+        /**
+         * Create Secret Key Value Not Exist
+         */
+        if(!Config::has('secret', 'key')) {
+            Config::set('secret', 'key', bin2hex(random_bytes(64)));
+        }
+        return;
+    }
+
+    /**
+     * Load Hook Files
+     * @return void
+     */
+    private static function LoadHookFiles(): void
+    {
+        $hooks_path = APP_PATH . '/lf-hooks';
+
+        // Create Directory if Not Exists
+        Directory::make($hooks_path);
+
+        // Load Each Hook File
+        $files = Directory::scanRecursive($hooks_path, false, 'php');
+        array_map(function ($path) { require $path; }, $files);
+    }
+
+    /**
+     * Do Required Tasks Before Dispatching Route
+     * @return void
+     */
+    private static function PreDispatcher(): void
+    {
+        // Register Error Handler
+        ErrorHandler::register();
+        // Create Secret Key
+        self::CreateSecretKey();
+        // Create Required Directories
+        self::CreateDirectories();
+        // Register Header
+        Response::instance()->register();
+        // Load Hooks
+        self::LoadHookFiles();
+        // Set App Info Environment
+        Env::set('app|info', apply_filter('config.app'));
         return;
     }
 }

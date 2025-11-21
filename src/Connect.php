@@ -23,30 +23,13 @@ use Laika\Model\ConnectionManager;
 use Laika\Session\SessionManager;
 use RuntimeException;
 
-class AppConnect
+class Connect
 {
-    /**
-     * Configure Started
-     * @var bool $started
-     */
-    private static bool $started = false;
-
-    public static function start()
-    {
-        if (self::$started) {
-            throw new RuntimeException("App Connect Already Started!");
-        }
-        self::$started = true;
-        self::setDb();
-        self::setTimezone();
-        self::setSession();
-    }
-
     /**
      * Database Connection
      * @return void
      */
-    private static function setDb(): void
+    public static function db(): void
     {
         try {
             $configs = Config::get('database', default:[]);
@@ -61,7 +44,7 @@ class AppConnect
      * Set Time Zone
      * @return void
      */
-    private static function setTimezone(): void
+    public static function timezone(): void
     {
         // Set Date Time
         date_default_timezone_set(option('time.zone', 'Europe/London'));
@@ -71,14 +54,13 @@ class AppConnect
      * Set Session
      * @return void
      */
-    private static function setSession(): void
+    public static function session(): void
     {
-        $session_config = [];
-        $dbsession = option('dbsession', 'no');
-        if ($dbsession == 'yes') {
-            $session_config = ConnectionManager::has('default') ? ConnectionManager::get() : [];
+        if (option_as_bool('dbsession', false)) {
+            SessionManager::config(ConnectionManager::get());
+            return;
         }
-        SessionManager::config($session_config);
+        SessionManager::config();
         return;
     }
 }
