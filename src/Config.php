@@ -105,10 +105,10 @@ class Config
         // Rebuild file content with short array syntax
         $content = self::make($obj->config[$name]);
 
-        if (!$file->writable()) {
-            throw new \RuntimeException("Config Write Permission Denied: '{$name}'");
+        if (!$file->write($content)) {
+            throw new \RuntimeException("Config Write Failed: '{$name}'");
         }
-        return $file->write($content);
+        return true;
     }
 
     // Check Name & Key Config Exists
@@ -157,10 +157,10 @@ class Config
         // Rebuild file content with short array syntax
         $content = self::make($obj->config[$name]);
 
-        if (!$file->writable()) {
-            throw new \RuntimeException("Config Write Permission Denied: '{$name}'");
+        if (!$file->write($content)) {
+            throw new \RuntimeException("Config Write Failed: '{$name}'");
         }
-        return $file->write($content);
+        return true;
     }
 
     // Create A New Config File
@@ -187,10 +187,10 @@ class Config
         // Make Array Values
         $content = self::make($data);
         // Create Config File
-        if (!$fileObj->writable()) {
-            throw new \RuntimeException("Config Write Permission Denied: {$name}");
+        if (!$fileObj->write($content)) {
+            throw new \RuntimeException("Config Write Failed: {$name}");
         }
-        return $fileObj->write($content);
+        return true;
     }
 
     ########################################################################################
