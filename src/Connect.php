@@ -21,7 +21,6 @@ if (php_sapi_name() !== 'cli' && !defined('APP_PATH')) {
 
 use Laika\Model\ConnectionManager;
 use Laika\Session\SessionManager;
-use RuntimeException;
 
 class Connect
 {
