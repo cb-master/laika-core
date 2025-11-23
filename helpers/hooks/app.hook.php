@@ -22,13 +22,13 @@ use Laika\Core\Config;
 /*------------------------- APP FILTERS --------------------------*/
 ####################################################################
 // App Host
-add_filter('app.host', function(): string
+add_hook('app.host', function(): string
 {
     return rtrim(host(), '/') . '/';
 });
 
 // App Name
-add_filter('app.name', function(){
+add_hook('app.name', function(){
     return option('app.name') ?: Config::get('app', ) ?: 'Laika Framework!';
 });
 
@@ -37,10 +37,10 @@ add_filter('app.name', function(){
  * @param ?string $option_key opt_ken column value in Database options Table
  * @return string
  */
-add_filter('app.logo', function(?string $option_key = null): string {
+add_hook('app.logo', function(?string $option_key = null): string {
     $name = option($option_key ?? '') ?: null;
     $logo = $name ?: 'logo.png';
-    return apply_filter('app.host') . "resource/img/{$logo}";
+    return do_hook('app.host') . "resource/img/{$logo}";
 });
 
 /**
@@ -48,10 +48,10 @@ add_filter('app.logo', function(?string $option_key = null): string {
  * @param ?string $option_key opt_ken column value in Database options Table
  * @return string
  */
-add_filter('app.icon', function(?string $option_key = null): string {
+add_hook('app.icon', function(?string $option_key = null): string {
     $name = option($option_key) ?: null;
     $icon = $name ?: 'favicon.ico';
-    return apply_filter('app.host') . "resource/img/{$icon}";
+    return do_hook('app.host') . "resource/img/{$icon}";
 });
 
 /**
@@ -60,7 +60,7 @@ add_filter('app.icon', function(?string $option_key = null): string {
  * @param array ...$args Other Parameters for sprintf()
  * @return string
  */
-add_filter('app.local', function(string $property, ...$args): string {
+add_hook('app.local', function(string $property, ...$args): string {
     // Return if Class Doesn't Exists
     if(!class_exists('LANG')) throw new RuntimeException("'LANG' Class Doesn't Exists!");
     // Return if Class Exists

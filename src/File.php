@@ -126,23 +126,11 @@ class File
         return pathinfo($this->file, PATHINFO_DIRNAME);
     }
 
-    ######################################################################
-    ## --------------------- BASIC FILE OPERATION --------------------- ##
-    ######################################################################
-    /**
-     * File Output Buffer
-     * @return void
-     */
-    public function read(): void
-    {
-        readfile($this->file);
-    }
-
     /**
      * Get File Content
      * @return string|false
      */
-    public function content(): string|false
+    public function read(): string|false
     {
         return file_get_contents($this->file);
     }
@@ -212,6 +200,17 @@ class File
     public function touch(?int $mtime = null, ?int $atime = null): bool
     {
         return touch($this->file, $mtime, $atime);
+    }
+
+    /**
+     * Require File
+     * @param bool $once Require Once if true
+     * @return void
+     */
+    public function require(bool $require_once = false): void
+    {
+        $require_once ? require_once $this->file : require $this->file;
+        return;
     }
 
     #########################################################################

@@ -116,8 +116,8 @@ class Dispatcher
         // Set Headers
         $token = new Token();
         Response::instance()->setHeader([
-            "Request-Time"  =>  apply_filter('config.app', 'start.time', time()),
-            "App-Provider"  =>  apply_filter('config.app', 'name', 'Laika Framework'),
+            "Request-Time"  =>  do_hook('config.app', 'start.time', time()),
+            "App-Provider"  =>  do_hook('config.app', 'name', 'Laika Framework'),
             "Authorization" =>  $token->generate([
                 'uid'       =>  mt_rand(100001, 999999),
                 'requestor' =>  Uri::instance()->base()
@@ -201,7 +201,7 @@ class Dispatcher
         // Load Hooks
         self::LoadHookFiles();
         // Set App Info Environment
-        Env::set('app|info', apply_filter('config.app'));
+        Env::set('app|info', do_hook('config.app'));
         return;
     }
 }

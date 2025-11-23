@@ -22,13 +22,13 @@ use Laika\Session\Session;
 /*----------------------- MESSAGE FILTERS ------------------------*/
 ####################################################################
 // Set Notification Message
-add_filter('message.set', function(?string $message, bool $status): void {
+add_hook('message.set', function(?string $message, bool $status): void {
     Session::set('message', ['info'=>$message,'status'=>$status]);
     return;
 });
 
 // Get Notification Message
-add_filter('message.show', function(): array {
+add_hook('message.show', function(): array {
     $message = Session::get('message');
     Session::pop('message');
     if(!$message) return [];

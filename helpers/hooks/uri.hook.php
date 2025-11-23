@@ -27,7 +27,7 @@ use Laika\Core\Uri;
  * @param string|array $queries - Optional Argument. Default is ''
  * @return string New Url
  */
-add_filter('uri.make', function(string|array $slug = '', array $queries = []): string {
+add_hook('uri.make', function(string|array $slug = '', array $queries = []): string {
     // Get Slug
     $slug = is_array($slug) ? $slug : [$slug];
     $slug = implode('/', $slug);

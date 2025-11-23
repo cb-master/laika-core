@@ -21,7 +21,7 @@ if (php_sapi_name() !== 'cli' && !defined('APP_PATH')) {
  * @param ?string $key Config Key. Optional Argument. Example: name, version etc.
  * @param mixed $default Default Value if no value found. Optional Argument.
  */
-add_filter('config.app', function(?string $key = null, mixed $default = null): mixed{
+add_hook('config.app', function(?string $key = null, mixed $default = null): mixed{
     return config('app', $key, $default);
 });
 
@@ -30,7 +30,7 @@ add_filter('config.app', function(?string $key = null, mixed $default = null): m
  * @param ?string $key Config Key. Optional Argument. Example: name, version etc.
  * @param mixed $default Default Value if no value found. Optional Argument.
  */
-add_filter('config.env', function(?string $key = null, mixed $default = null): mixed{
+add_hook('config.env', function(?string $key = null, mixed $default = null): mixed{
     return config('env', $key, $default);
 });
 
@@ -39,7 +39,7 @@ add_filter('config.env', function(?string $key = null, mixed $default = null): m
  * @param ?string $key Config Key. Optional Argument. Example: name, version etc.
  * @param mixed $default Default Value if no value found. Optional Argument.
  */
-add_filter('config.database', function(?string $key = null, mixed $default = null): mixed{
+add_hook('config.database', function(?string $key = null, mixed $default = null): mixed{
     return config('database', $key, $default);
 });
 
@@ -48,7 +48,7 @@ add_filter('config.database', function(?string $key = null, mixed $default = nul
  * @param ?string $key Config Key. Optional Argument. Example: name, version etc.
  * @param mixed $default Default Value if no value found. Optional Argument.
  */
-add_filter('config.memcached', function(?string $key = null, mixed $default = null): mixed{
+add_hook('config.memcached', function(?string $key = null, mixed $default = null): mixed{
     return config('memcached', $key, $default);
 });
 
@@ -57,7 +57,7 @@ add_filter('config.memcached', function(?string $key = null, mixed $default = nu
  * @param ?string $key Config Key. Optional Argument. Example: name, version etc.
  * @param mixed $default Default Value if no value found. Optional Argument.
  */
-add_filter('config.redis', function(?string $key = null, mixed $default = null): mixed{
+add_hook('config.redis', function(?string $key = null, mixed $default = null): mixed{
     return config('redis', $key, $default);
 });
 
@@ -66,6 +66,6 @@ add_filter('config.redis', function(?string $key = null, mixed $default = null):
  * @param ?string $key Config Key. Optional Argument. Example: name, version etc.
  * @param mixed $default Default Value if no value found. Optional Argument.
  */
-add_filter('config.secret', function(?string $key = 'key', mixed $default = null): mixed{
+add_hook('config.secret', function(?string $key = 'key', mixed $default = null): mixed{
     return config('secret', $key, $default);
 });

@@ -26,7 +26,7 @@ use Laika\Core\Date;
  * @param int $time Unix Timestamps
  * @return string
  */
-add_filter('showdate', function(int $time): string{
+add_hook('showdate', function(int $time): string{
     $date = new Date(format:option('time.format', 'Y-M-d H:i:s'));
     $date->setTimestamp($time);
     return $date->format();
