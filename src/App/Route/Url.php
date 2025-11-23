@@ -15,7 +15,6 @@ namespace Laika\Core\App\Route;
 
 use Laika\Core\App\Router;
 use Laika\Core\Directory;
-use Laika\Core\File;
 
 class Url
 {
@@ -132,19 +131,32 @@ class Url
     {
         Router::get(self::$resourceSlug.'/{name:.+}', function($name) {
             // Trim leading/trailing slashes
-            $path = trim($name, '/');
+            $name = trim($name, '/');
+
+            // Supported Content Types
+            $types = [
+                'css'   =>  'text/css',
+                'js'    =>  'application/javascript',
+                'png'   =>  'image/png',
+                'jpg'   =>  'image/jpeg',
+                'jpeg'  =>  'image/jpeg',
+                'gif'   =>  'image/gif',
+                'svg'   =>  'image/svg+xml',
+                'webp'  =>  'image/webp',
+                'ico'   =>  'image/x-icon',
+            ];
+
             // Get Asset File Path
-            $file = realpath(APP_PATH."/lf-templates/{$path}") ?: APP_PATH . "/lf-assets/{$path}";
+            $file = realpath(APP_PATH."/lf-templates/{$name}") ?: APP_PATH . "/lf-assets/{$name}";
             if(!is_file($file)){
                 http_response_code(404);
                 return;
             }
+
             // Read File
-            $obj = new File($file);
-            // Set Content Type
-            header("Content-Type: {$obj->mimeType()}");
-            // Set Output Buffer
-            $obj->read();
+            $ext = pathinfo($file, PATHINFO_EXTENSION);
+            if (array_key_exists(strtolower($ext), $types)) header("Content-Type: {$types[$ext]}");
+            readfile($file);
             return;
         })->name('resource');
     }

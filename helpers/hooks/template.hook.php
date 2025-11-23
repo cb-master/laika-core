@@ -22,18 +22,18 @@ if (php_sapi_name() !== 'cli' && !defined('APP_PATH')) {
 /*----------------------- TEMPLATE FILTERS ------------------------*/
 #####################################################################
 // Load Asset
-add_filter('template.asset', function(string $file): string {
+add_hook('template.asset', function(string $file): string {
     if(parse_url($file, PHP_URL_HOST)){
         return $file;
     }
     $file = trim($file, '/');
-    return apply_filter('app.host') . "resource/{$file}";
+    return do_hook('app.host') . "resource/{$file}";
 });
 
 // Set Template Default JS Vars
-add_filter('template.scripts', function(): string{
+add_hook('template.scripts', function(): string{
     $authorizarion = Response::instance()->get('authorization');
-    $appuri = trim(apply_filter('app.host'), '/');
+    $appuri = trim(do_hook('app.host'), '/');
     $timeformat = option('time.format', 'Y-M-d H:i:s');
     return <<<HTML
         <script>

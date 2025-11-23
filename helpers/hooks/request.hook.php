@@ -22,22 +22,22 @@ use Laika\Core\Http\Request;
 /*------------------------ REQUEST FILTERS -------------------------*/
 ######################################################################
 // Get Request Header
-add_filter('request.header', function(string $key): ?string {
+add_hook('request.header', function(string $key): ?string {
     return Request::instance()->header($key);
 });
 
 // Get Request Input Value
-add_filter('request.input', function(string $key, mixed $default = ''): mixed {
+add_hook('request.input', function(string $key, mixed $default = ''): mixed {
     return Request::instance()->input($key, $default);
 });
 
 // Get Request Values
-add_filter('request.all', function(): array {
+add_hook('request.all', function(): array {
     return Request::instance()->all();
 });
 
 // Check Method Request is Post/Get/Ajax
-add_filter('request.is', function(string $method): bool {
+add_hook('request.is', function(string $method): bool {
     $method = strtolower($method);
     switch ($method) {
         case 'post':
@@ -68,7 +68,7 @@ add_filter('request.is', function(string $method): bool {
  * Get Request Error
  * @return string
  */
-add_filter('request.error', function(string $key): string{
+add_hook('request.error', function(string $key): string{
     $errors = Request::instance()->errors();
     return $errors[$key][0] ?? '';
 });

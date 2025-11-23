@@ -22,25 +22,25 @@ use Laika\Core\Uri;
 /*------------------------- PAGE FILTERS -------------------------*/
 ####################################################################
 // Page Title
-add_filter('page.title', function(string $title): string {
-    return "{$title} | " . apply_filter('app.name');
+add_hook('page.title', function(string $title): string {
+    return "{$title} | " . do_hook('app.name');
 });
 
 // Page Number
-add_filter('page.number', function(): int {
-    $number = (int) apply_filter('request.input', 'page', 1);
+add_hook('page.number', function(): int {
+    $number = (int) do_hook('request.input', 'page', 1);
     return $number < 1 ? 1 : $number;
 });
 
 // Next Page Number
-add_filter('page.next', function()
+add_hook('page.next', function()
 {
     $uri = new Uri();
     return $uri->incrementQuery();
 });
 
 // Previous Page Number
-add_filter('page.previous', function()
+add_hook('page.previous', function()
 {
     $uri = new Uri();
     return $uri->decrementQuery();

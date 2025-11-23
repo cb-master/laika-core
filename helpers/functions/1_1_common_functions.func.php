@@ -101,7 +101,7 @@ function redirect(string|array $slug, ?array $params = null): void
  * @param int $priority Optional Argument. Default is 10
  * @return void
 */
-function add_filter(string $filter, callable $callback, int $priority = 10): void
+function add_hook(string $filter, callable $callback, int $priority = 10): void
 {
     Filter::add_filter($filter, $callback, $priority);
 }
@@ -113,7 +113,7 @@ function add_filter(string $filter, callable $callback, int $priority = 10): voi
  * @param mixed ...$args Optional Arguments.
  * @return mixed
 */
-function apply_filter(string $filter, mixed $value = null, mixed ...$args): mixed
+function do_hook(string $filter, mixed $value = null, mixed ...$args): mixed
 {
     return Filter::apply_filter($filter, $value, ...$args);
 }
@@ -170,7 +170,7 @@ function named(string $name, array $params = [], bool $url = false): string
  */
 function showdate(int $unixtime): string
 {
-    return apply_filter('date.show', $unixtime);
+    return do_hook('date.show', $unixtime);
 }
 
 /**
