@@ -299,17 +299,11 @@ class Handler
     public static function namedUrl(string $name, array $params = []): string
     {
         $namedRoutes = self::getNamedRoutes();
-        if (!array_key_exists($name, $namedRoutes)) {
-            return '';
-        }
-
-        $uri = $namedRoutes[$name];
-
+        $uri = $namedRoutes[$name] ?? trim($name, '/');
         // Replace {param} placeholders
         foreach ($params as $key => $value) {
             $uri = preg_replace('/\{' . $key . '(:[^}]*)?\}/', (string) $value, $uri);
         }
-
         // Remove unreplaced params
         $uri = preg_replace('/\{[^}]+\}/', '', $uri);
 
