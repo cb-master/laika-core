@@ -29,7 +29,7 @@ add_hook('app.host', function(): string
 
 // App Name
 add_hook('app.name', function(){
-    return option('app.name') ?: Config::get('app', ) ?: 'Laika Framework!';
+    return option('app.name', do_hook('config.app', 'name', 'Laika Framework!'));
 });
 
 /**
