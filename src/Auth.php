@@ -179,9 +179,6 @@ class Auth
         $stmt = $this->pdo->prepare("SELECT event FROM {$this->table} WHERE event = :event LIMIT 1");
         $stmt->execute([':event' => $this->event]);
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
-        if (!$row) {
-            return $uid;
-        }
-        return $this->generateEventKey();
+        return !$row ? $uid : $this->generateEventKey();
     }
 }
