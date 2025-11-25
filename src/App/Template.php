@@ -109,7 +109,7 @@ class Template
     {
         $subdir = $subdir ? trim($subdir, '/') : '';
         $this->templateDirectory = is_dir($subdir) ? $subdir : APP_PATH . "/lf-templates/{$subdir}";
-        $this->templateDirectory = realpath($this->templateDirectory);
+        $this->templateDirectory = rtrim($this->templateDirectory, '/');
         Directory::make($this->templateDirectory);
     }
 
@@ -118,7 +118,7 @@ class Template
     {
         $subdir = $subdir ? trim($subdir, '/') : '';
         $this->cacheDirectory = is_dir($subdir) ? $subdir : APP_PATH . "/lf-cache/{$subdir}";
-        $this->cacheDirectory = realpath($this->cacheDirectory);
+        $this->cacheDirectory = rtrim($this->cacheDirectory, '/');
         Directory::make($this->cacheDirectory);
     }
 }
