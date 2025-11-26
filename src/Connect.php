@@ -30,12 +30,18 @@ class Connect
      */
     public static function db(): void
     {
-        try {
-            $configs = Config::get('database', default:[]);
+        // Get Database Configs
+        $configs = Config::get('database', default:[]);
+        // Start All Connections
+        if (!empty($configs)) {
             foreach ($configs as $name => $config) {
-                ConnectionManager::add($config, $name);
+                try {
+                    ConnectionManager::add($config, $name);
+                } catch (\Throwable $th) {
+                    throw new Exceptions\HttpException(500, "'{$name}' Database Error: {$th->getMessage()}", $th->getCode());
+                }
             }
-        } catch (\Throwable $th) {}
+        }
         return;
     }
 

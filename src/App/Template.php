@@ -104,21 +104,29 @@ class Template
     /*-------------------------------- PRIVATE API --------------------------------*/
     #################################################################################
 
-    // Ensure Template Path
+    /**
+     * Ensure Template Path
+     * @param ?string $subdir Sub Directory Path
+     * @return void
+     */
     private function ensureTemplatePath(?string $subdir = null): void
     {
         $subdir = $subdir ? trim($subdir, '/') : '';
         $this->templateDirectory = is_dir($subdir) ? $subdir : APP_PATH . "/lf-templates/{$subdir}";
-        $this->templateDirectory = realpath($this->templateDirectory);
+        $this->templateDirectory = rtrim($this->templateDirectory, '/');
         Directory::make($this->templateDirectory);
     }
 
-    // Ensure Template Path
+    /**
+     * Ensure Cache Path
+     * @param ?string $subdir Sub Directory Path
+     * @return void
+     */
     private function ensureCachePath(?string $subdir = null): void
     {
         $subdir = $subdir ? trim($subdir, '/') : '';
         $this->cacheDirectory = is_dir($subdir) ? $subdir : APP_PATH . "/lf-cache/{$subdir}";
-        $this->cacheDirectory = realpath($this->cacheDirectory);
+        $this->cacheDirectory = rtrim($this->cacheDirectory, '/');
         Directory::make($this->cacheDirectory);
     }
 }
