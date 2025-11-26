@@ -11,14 +11,9 @@
 
 declare(strict_types=1);
 
-namespace Laika\Core;
+namespace Laika\Core\Helper;
 
-// Deny Direct Access
-if (php_sapi_name() !== 'cli' && !defined('APP_PATH')) {
-    http_response_code(403);
-    exit('Direct Access Denied!');
-}
-
+use Laika\Core\Http\Response;
 use Laika\Core\Http\Request;
 use Laika\Session\Session;
 
@@ -172,6 +167,6 @@ class CSRF
      */
     private function header(string $value): void
     {
-        Http\Response::instance()->setHeader([$this->header => $value]);
+        Response::instance()->setHeader([$this->header => $value]);
     }
 }

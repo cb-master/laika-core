@@ -10,13 +10,7 @@
 
 declare(strict_types=1);
 
-namespace Laika\Core;
-
-// Deny Direct Access
-if (php_sapi_name() !== 'cli' && !defined('APP_PATH')) {
-    http_response_code(403);
-    exit('Direct Access Denied!');
-}
+namespace Laika\Core\Helper;
 
 class Cookie
 {
@@ -35,7 +29,7 @@ class Cookie
         } else {
             $value = (string) $value;
         }
-        $uri = new Uri();
+        $uri = new Url();
         return setcookie($name, rawurlencode($value), [
             'expires'  => time() + $expires,
             'path'     => $path,
@@ -79,7 +73,7 @@ class Cookie
     public static function pop(string $name, string $path = '/'): bool
     {
         if (isset($_COOKIE[$name])) {
-            $uri = new Uri();
+            $uri = new Url();
             setcookie($name, '', [
                 'expires'  => time() - 3600,
                 'path'     => $path,

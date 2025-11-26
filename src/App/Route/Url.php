@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace Laika\Core\App\Route;
 
+use Laika\Core\Helper\Directory;
 use Laika\Core\App\Router;
-use Laika\Core\Directory;
 
 class Url
 {

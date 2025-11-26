@@ -1,9 +1,28 @@
 <?php
 
-namespace Laika\Core\Http;
+/**
+ * Laika PHP MVC Framework
+ * Author: Showket Ahmed
+ * Email: riyadhtayf@gmail.com
+ * License: MIT
+ * This file is part of the Laika PHP MVC Framework.
+ * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
+ */
 
-class ApiResponse
+declare(strict_types=1);
+
+namespace Laika\Core\Api;
+
+class Response
 {
+    /**
+     * Send Success Response
+     * @param array $data
+     * @param string $message
+     * @param int $status
+     * @param array $meta
+     * @return void
+     */
     public static function success(
         array $data = [],
         string $message = 'Success',
@@ -22,6 +41,14 @@ class ApiResponse
         exit;
     }
 
+    /**
+     * Send Error Response
+     * @param string $message
+     * @param int $status
+     * @param array $errors
+     * @param array $meta
+     * @return void
+     */
     public static function error(
         string $message = 'Error',
         int $status = 400,

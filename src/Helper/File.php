@@ -9,13 +9,7 @@
  * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
  */
 
-namespace Laika\Core;
-
-// Deny Direct Access
-if (php_sapi_name() !== 'cli' && !defined('APP_PATH')) {
-    http_response_code(403);
-    exit('Direct Access Denied!');
-}
+namespace Laika\Core\Helper;
 
 class File
 {
@@ -82,7 +76,7 @@ class File
      * Get Mime Type
      * @return string|false Mime Type of File on Success and false on Fail
      */
-    public function mimeType(): string|false
+    public function mime(): string|false
     {
         $finfo = finfo_open(FILEINFO_MIME_TYPE);
         $mime = finfo_file($finfo, $this->file);
@@ -223,7 +217,7 @@ class File
     public function download(?string $as = null): void
     {
         $filename = $as ?? $this->name();
-        $mime = $this->mimeType() ?: 'application/octet-stream';
+        $mime = $this->mime() ?: 'application/octet-stream';
 
         header("Content-Type: {$mime}");
         header("Content-Disposition: attachment; filename=\"{$filename}\"");

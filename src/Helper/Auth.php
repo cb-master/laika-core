@@ -11,13 +11,7 @@
 
 declare(strict_types=1);
 
-namespace Laika\Core;
-
-// Deny Direct Access
-if (php_sapi_name() !== 'cli' && !defined('APP_PATH')) {
-    http_response_code(403);
-    exit('Direct Access Denied!');
-}
+namespace Laika\Core\Helper;
 
 use Laika\Model\ConnectionManager;
 use Laika\Session\Session;
@@ -64,7 +58,7 @@ class Auth
         // Create Table if Does Not Exists
         Schema::setConnection();
         Schema::create($this->table, function($e){
-            $e->string('event', 50)
+            $e->string('event', 64)
                 ->mediumText('data')
                 ->integer('expire')
                 ->integer('created')
@@ -174,7 +168,7 @@ class Auth
      */
     private function generateEventKey(): string
     {
-        $uid = uniqid('event-').'-'.uniqid().'-'.Config::get('env', 'start.time', time());
+        $uid = bin2hex(random_bytes(32));
         // Check Already Exist & Return
         $stmt = $this->pdo->prepare("SELECT event FROM {$this->table} WHERE event = :event LIMIT 1");
         $stmt->execute([':event' => $this->event]);

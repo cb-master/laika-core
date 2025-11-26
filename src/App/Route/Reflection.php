@@ -25,7 +25,15 @@ class Reflection
      * @var array $params
      */
     private array $params;
+
+    /**
+     * @var callable|array $callable
+     */
     private $callable;
+
+    /**
+     * @var ReflectionFunctionAbstract $reflection
+     */
     private ReflectionFunctionAbstract $reflection;
 
     public function __construct(callable|array $callable, array $params = [])

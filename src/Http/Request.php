@@ -13,18 +13,12 @@ declare(strict_types=1);
 
 namespace Laika\Core\Http;
 
-// Deny Direct Access
-if (php_sapi_name() !== 'cli' && !defined('APP_PATH')) {
-    http_response_code(403);
-    exit('Direct Access Denied!');
-}
-
 class Request
 {
     /**
-     * @property ?self $instance
+     * @property Request $instance
      */
-    protected static ?self $instance = null;
+    protected static Request $instance;
 
     /**
      * @property array $get
@@ -82,11 +76,11 @@ class Request
 
     /**
      * Get Instance
-     * @return self
+     * @return Request
      */
-    public static function instance(): self
+    public static function instance(): Request
     {
-        self::$instance ??= new self();
+        self::$instance ??= new Request();
         return self::$instance;
     }
 

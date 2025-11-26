@@ -13,21 +13,15 @@ declare(strict_types=1);
 
 namespace Laika\Core\Http;
 
-// Deny Direct Access
-if (php_sapi_name() !== 'cli' && !defined('APP_PATH')) {
-    http_response_code(403);
-    exit('Direct Access Denied!');
-}
-
 use Laika\Session\Session;
-use Laika\Core\Uri;
+use Laika\Core\Helper\Url;
 
 class Redirect
 {
     /**
-     * @property ?self $instance
+     * @property Redirect $instance
      */
-    protected static ?self $instance = null;
+    protected static Redirect $instance;
 
     /**
      * App Host
@@ -44,17 +38,16 @@ class Redirect
      */
     public function __construct()
     {
-        $uri = new Uri();
-        $this->host =   apply_filter('app.host', $uri->base());
+        $this->host = do_hook('app.host', Url::instance()->base());
     }
 
     /**
      * Get Instance
-     * @return self
+     * @return Redirect
      */
-    public static function instance(): self
+    public static function instance(): Redirect
     {
-        self::$instance ??= new self();
+        self::$instance ??= new Redirect();
         return self::$instance;
     }
 
@@ -82,6 +75,8 @@ class Redirect
 
     /**
      * Get Method
+     * @param string $to URL to Redirect.
+     * @param int $code HTTP Status Code. Default is 302.
      * @return void
      */
     public function to(string $to, int $code = 302): void
@@ -99,10 +94,16 @@ class Redirect
 
     /**
      * Redirect
+     * @param string $to URL to Redirect.
+     * @param int $code HTTP Status Code. Default is 302.
      * @return never
      */
-    private function send(?string $to = null, int $code = 302): never
+    private function send(string $to, int $code = 302): never
     {
+        $url = parse_url($to, PHP_URL_HOST);
+        if (!$url) {
+            $to = $this->host . trim($to, '/');
+        }
         header("Location:{$to}", true, $code);
         exit();
     }

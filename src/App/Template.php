@@ -13,16 +13,12 @@ declare(strict_types=1);
 
 namespace Laika\Core\App;
 
-// Deny Direct Access
-if (php_sapi_name() !== 'cli' && !defined('APP_PATH')) {
-    http_response_code(403);
-    exit('Direct Access Denied!');
-}
-
-use Twig\{Loader\FilesystemLoader as Engine, Environment, TwigFilter};
-use Laika\Core\Directory;
-use Laika\Core\Local;
-use Laika\Core\File;
+use Twig\Loader\FilesystemLoader as Engine;
+use Laika\Core\Helper\Directory;
+use Laika\Core\Helper\Local;
+use Laika\Core\Helper\File;
+use Twig\Environment;
+use Twig\TwigFilter;
 
 class Template
 {
@@ -46,11 +42,18 @@ class Template
      */
     protected ?string $cacheDirectory;
 
+    /**
+     * File Extension
+     * @var string
+     */
+    protected string $extension;
+
     public function __construct(?string $templateSubDirectory = null, ?string $cacheSubDirectory = null)
     {
         // Ensure Template & Cache Paths
         $this->ensureTemplatePath($templateSubDirectory);
         $this->ensureCachePath($cacheSubDirectory);
+        $this->extension = 'twig';
 
         // Run Template Engine
         $engine = new Engine($this->templateDirectory);
@@ -77,9 +80,25 @@ class Template
         $file->require(true);
     }
 
+    /**
+     * Set File Extension
+     * @param string $extension File Extension
+     * @return void
+     */
+    public function extension(string $extension): void
+    {
+        $this->extension = $extension;
+        return;
+    }
+
+    /**
+     * Render View
+     * @param string $name View Name
+     * @return string Rendered View
+     */
     public function view(string $name): string
     {
-        return $this->twig->render("{$name}.twig", $this->vars);
+        return $this->twig->render("{$name}.{$this->extension}", $this->vars);
     }
 
     /**
