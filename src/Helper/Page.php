@@ -9,13 +9,7 @@
  * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
  */
 
-namespace Laika\Core;
-
-// Deny Direct Access
-if (php_sapi_name() !== 'cli' && !defined('APP_PATH')) {
-    http_response_code(403);
-    exit('Direct Access Denied!');
-}
+namespace Laika\Core\Helper;
 
 class Page
 {
@@ -85,7 +79,7 @@ class Page
      */
     public function next(): string
     {
-        return Uri::instance()->incrementQuery();
+        return Url::instance()->incrementQuery();
     }
 
     /**
@@ -94,6 +88,6 @@ class Page
      */
     public function previous()
     {
-        return Uri::instance()->decrementQuery();
+        return Url::instance()->decrementQuery();
     }
 }

@@ -11,14 +11,9 @@
 
 declare(strict_types=1);
 
-namespace Laika\Core;
+namespace Laika\Core\Helper;
 
-// Deny Direct Access
-if (php_sapi_name() !== 'cli' && !defined('APP_PATH')) {
-    http_response_code(403);
-    exit('Direct Access Denied!');
-}
-
+use Laika\Core\Exceptions\HttpException;
 use Laika\Model\ConnectionManager;
 use Laika\Session\SessionManager;
 
@@ -38,7 +33,7 @@ class Connect
                 try {
                     ConnectionManager::add($config, $name);
                 } catch (\Throwable $th) {
-                    throw new Exceptions\HttpException(500, "'{$name}' Database Error: {$th->getMessage()}", $th->getCode());
+                    throw new HttpException(500, "'{$name}' Database Error: {$th->getMessage()}", $th->getCode());
                 }
             }
         }

@@ -13,14 +13,9 @@ declare(strict_types=1);
 
 namespace Laika\Core\Storage;
 
-// Deny Direct Access
-if (php_sapi_name() !== 'cli' && !defined('APP_PATH')) {
-    http_response_code(403);
-    exit('Direct Access Denied!');
-}
-
+use Laika\Core\Helper\Directory;
 use Aws\Exception\AwsException;
-use Laika\Core\{Directory, Uri};
+use Laika\Core\Helper\Url;
 use RuntimeException;
 use Aws\S3\S3Client;
 use Exception;
@@ -223,9 +218,8 @@ class FileStorage
     protected function url(string $file): string
     {
         $file = ltrim($file, '/');
-        $uri = new Uri();
         return match ($this->disk) {
-            'local' => str_replace(ltrim(APP_PATH, '/'), '', ltrim(option('app.host', rtrim($uri->base(), '/')) . "{$file}", '/')),
+            'local' => str_replace(ltrim(APP_PATH, '/'), '', ltrim(option('app.host', rtrim(Url::base(), '/')) . "{$file}", '/')),
             's3'    => $this->publicBaseUrl
                 ? $this->publicBaseUrl . $file
                 : sprintf("https://%s.s3.%s.amazonaws.com/%s", $this->config['bucket'], $this->config['region'], $file),

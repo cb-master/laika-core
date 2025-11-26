@@ -11,17 +11,10 @@
 
 declare(strict_types=1);
 
-namespace Laika\Core;
-
-// Deny Direct Access
-if (php_sapi_name() !== 'cli' && !defined('APP_PATH')) {
-    http_response_code(403);
-    exit('Direct Access Denied!');
-}
+namespace Laika\Core\Helper;
 
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
-use Laika\Core\Config;
 use Exception;
 
 class Token
@@ -48,13 +41,13 @@ class Token
      * Algorithm
      * @var string $algorithm
      */
-    private string $algorithm = 'HS256';
+    private string $algorithm;
 
     /**
      * Token Expire Time
      * @var int $expiration Default 1 hour
      */
-    private int $expiration = 3600;
+    private int $expiration;
 
     /**
      * User Data
@@ -68,11 +61,12 @@ class Token
      */
     public function __construct(?int $expiration = null)
     {
-        $uri = new Uri();
+        $uri = new Url();
         $this->secret = Config::get('secret', 'key');
         $this->issuer = $uri->host();
+        $this->algorithm = 'HS256';
         $this->audience = $uri->host();
-        $this->expiration = $expiration ?: $this->expiration;
+        $this->expiration = $expiration ?: 3600;
     }
 
     /**

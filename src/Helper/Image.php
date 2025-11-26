@@ -9,16 +9,10 @@
  * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
  */
 
-namespace Laika\Core;
+namespace Laika\Core\Helper;
 
-// Deny Direct Access
-if (php_sapi_name() !== 'cli' && !defined('APP_PATH')) {
-    http_response_code(403);
-    exit('Direct Access Denied!');
-}
-
-use GdImage;
 use InvalidArgumentException;
+use GdImage;
 
 class Image
 {

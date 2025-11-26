@@ -11,15 +11,8 @@
 
 declare(strict_types=1);
 
-namespace Laika\Core;
+namespace Laika\Core\Helper;
 
-// Deny Direct Access
-if (php_sapi_name() !== 'cli' && !defined('APP_PATH')) {
-    http_response_code(403);
-    exit('Direct Access Denied!');
-}
-
-use Laika\Core\Config;
 use RuntimeException;
 
 class Vault
@@ -46,20 +39,20 @@ class Vault
      * Encryption Tag Length
      * @var int $chiper
      */
-    private int $tagLength = 16;
+    private int $tagLength;
 
     public function __construct()
     {
         if (!extension_loaded('openssl')) {
-            throw new RuntimeException("'openssl' Extension Not Found!");
+            throw new RuntimeException("Extension Not Found: 'openssl'");
         }
 
-        $this->cipher       =   'aes-256-gcm';
-        $this->tagLength    =   16;
+        $this->cipher = 'aes-256-gcm';
+        $this->tagLength = 16;
 
         // Hash The Key for Consistency
-        $this->key      =   hash('sha256', Config::get('secret', 'key'), true);
-        $this->ivLength =   openssl_cipher_iv_length($this->cipher);
+        $this->key = hash('sha256', Config::get('secret', 'key'), true);
+        $this->ivLength = openssl_cipher_iv_length($this->cipher);
     }
 
     /**

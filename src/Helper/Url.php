@@ -11,21 +11,15 @@
 
 declare(strict_types=1);
 
-namespace Laika\Core;
+namespace Laika\Core\Helper;
 
-// Deny Direct Access
-if (php_sapi_name() !== 'cli' && !defined('APP_PATH')) {
-    http_response_code(403);
-    exit('Direct Access Denied!');
-}
-
-class Uri
+class Url
 {
     /**
      * Singleton Object
-     * @var ?object $instance
+     * @var Url $instance
      */
-    private static ?object $instance;
+    private static Url $instance;
 
     /**
      * Scheme
@@ -89,11 +83,11 @@ class Uri
 
     /**
      * Singleton Instance
-     * @return self
+     * @return Url
      */
-    public static function instance(): self
+    public static function instance(): Url
     {
-        self::$instance ??= new self();
+        self::$instance ??= new Url();
         return self::$instance;
     }
 

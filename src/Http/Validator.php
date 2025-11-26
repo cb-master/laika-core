@@ -13,12 +13,6 @@ declare(strict_types=1);
 
 namespace Laika\Core\Http;
 
-// Deny Direct Access
-if (php_sapi_name() !== 'cli' && !defined('APP_PATH')) {
-    http_response_code(403);
-    exit('Direct Access Denied!');
-}
-
 class Validator
 {
     /**

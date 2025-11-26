@@ -16,7 +16,7 @@ if (php_sapi_name() !== 'cli' && !defined('APP_PATH')) {
     exit('Direct Access Denied!');
 }
 
-use Laika\Core\Uri;
+use Laika\Core\Helper\Url;
 
 ####################################################################
 /*------------------------- PAGE FILTERS -------------------------*/
@@ -35,13 +35,11 @@ add_hook('page.number', function(): int {
 // Next Page Number
 add_hook('page.next', function()
 {
-    $uri = new Uri();
-    return $uri->incrementQuery();
+    return Url::instance()->incrementQuery();
 });
 
 // Previous Page Number
 add_hook('page.previous', function()
 {
-    $uri = new Uri();
-    return $uri->decrementQuery();
+    return Url::instance()->decrementQuery();
 });

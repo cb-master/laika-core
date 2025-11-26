@@ -10,21 +10,15 @@
 
 declare(strict_types=1);
 
-// Deny Direct Access
-if (php_sapi_name() !== 'cli' && !defined('APP_PATH')) {
-    http_response_code(403);
-    exit('Direct Access Denied!');
-}
-
+use Laika\Core\Api\Response as ApiResponse;
 use Laika\Core\Exceptions\HttpException;
 use Laika\Core\Exceptions\Handler;
-use Laika\Core\Http\ApiResponse;
 use Laika\Core\Http\Response;
+use Laika\Core\Helper\Config;
+use Laika\Core\Helper\Filter;
+use Laika\Core\Helper\Option;
 use Laika\Core\App\Router;
-use Laika\Core\Config;
-use Laika\Core\Filter;
-use Laika\Core\Option;
-use Laika\Core\Uri;
+use Laika\Core\Helper\Url;
 
 // Dump Data & Die
 /**
@@ -89,8 +83,7 @@ function redirect(string|array $slug, ?array $params = null): void
     $slug = trim($slug, '/');
 
     // Redirect
-    $uri = new Uri();
-    header('Location:' . $uri->build($slug, $params ?: []), true);
+    header('Location:' . Url::instance()->build($slug, $params ?: []), true);
     die();
 }
 
@@ -146,8 +139,7 @@ function option_as_bool(string $key): bool
  */
 function host(): string
 {
-    $uri = new Uri();
-    return option('app.host') ?: $uri->base();
+    return option('app.host') ?: Url::instance()->base();
 }
 
 /**

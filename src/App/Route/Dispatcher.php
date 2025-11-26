@@ -14,14 +14,14 @@ declare(strict_types=1);
 namespace Laika\Core\App\Route;
 
 use Laika\Core\Exceptions\Handler as ErrorHandler;
+use Laika\Core\Helper\Url as UriHelper;
+use Laika\Core\Helper\Directory;
 use Laika\Core\Http\Response;
-use Laika\Core\Directory;
+use Laika\Core\Helper\Config;
+use Laika\Core\Helper\Local;
+use Laika\Core\Helper\Token;
 use Laika\Core\App\Env;
-use Laika\Core\Config;
-use Laika\Core\Local;
-use Laika\Core\Token;
 use RuntimeException;
-use Laika\Core\Uri;
 
 class Dispatcher
 {
@@ -31,7 +31,7 @@ class Dispatcher
         self::PreDispatcher();
 
         // Get Request Url
-        $uri = new Uri();
+        $uri = new UriHelper();
         $requestUrl = Url::normalize($uri->path());
 
         // Get If Request Uri Matched With Router List
@@ -120,7 +120,7 @@ class Dispatcher
             "App-Provider"  =>  do_hook('config.app', 'name', 'Laika Framework'),
             "Authorization" =>  $token->generate([
                 'uid'       =>  mt_rand(100001, 999999),
-                'requestor' =>  Uri::instance()->base()
+                'requestor' =>  UriHelper::instance()->base()
             ])
         ]);
         return;
