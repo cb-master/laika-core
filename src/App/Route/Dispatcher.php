@@ -117,7 +117,7 @@ class Dispatcher
         $token = new Token();
         Response::instance()->setHeader([
             "Request-Time"  =>  do_hook('config.app', 'start.time', time()),
-            "App-Provider"  =>  do_hook('config.app', 'name', 'Laika Framework'),
+            "App-Name"      =>  do_hook('config.app', 'name', 'Laika Framework'),
             "Authorization" =>  $token->generate([
                 'uid'       =>  mt_rand(100001, 999999),
                 'requestor' =>  UriHelper::instance()->base()
@@ -180,8 +180,10 @@ class Dispatcher
         Directory::make($hooks_path);
 
         // Load Each Hook File
-        $files = Directory::scanRecursive($hooks_path, false, 'php');
-        array_map(function ($path) { require $path; }, $files);
+        $files = Directory::files($hooks_path, '.hook.php');
+        foreach ($files as $path) {
+            require $path;
+        }
     }
 
     /**
