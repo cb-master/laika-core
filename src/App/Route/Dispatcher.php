@@ -40,9 +40,6 @@ class Dispatcher
         // Get Parameters
         $params = $res['params'];
 
-        // Load Local
-        array_key_exists($uri->segment(1), Handler::getGroups()) ? Local::load($uri->segment(1)) : Local::load();
-
         // Execute Fallback For Invalid Route
         if ($res['route'] === null) {
 
