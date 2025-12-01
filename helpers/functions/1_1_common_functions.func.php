@@ -130,7 +130,7 @@ function option(string $key, mixed $default = null): mixed
 function option_as_bool(string $key): bool
 {
     $value = option($key, false);
-    return is_bool($value) ? $value : (bool) preg_match('/^(yes|true|on|1)$/i', $value);
+    return is_bool($value) ? $value : (bool) preg_match('/^(yes|enable|true|on|1)$/i', $value);
 }
 
 /**

@@ -39,6 +39,15 @@ add_hook('config.database', function(?string $key = null, mixed $default = null)
 });
 
 /**
+ * Mail Config
+ * @param ?string $key Config Key. Optional Argument. Example: name, version etc.
+ * @param mixed $default Default Value if no value found. Optional Argument.
+ */
+add_hook('config.mail', function(?string $key = null, mixed $default = null): mixed{
+    return config('mail', $key, $default);
+});
+
+/**
  * Database Config
  * @param ?string $key Config Key. Optional Argument. Example: name, version etc.
  * @param mixed $default Default Value if no value found. Optional Argument.

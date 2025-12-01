@@ -11,12 +11,7 @@
 declare(strict_types=1);
 
 use Laika\Core\Http\Response;
-
-// Deny Direct Access
-if (php_sapi_name() !== 'cli' && !defined('APP_PATH')) {
-    http_response_code(403);
-    exit('Direct Access Denied!');
-}
+use Laika\Core\App\Route\Url;
 
 #####################################################################
 /*----------------------- TEMPLATE FILTERS ------------------------*/
@@ -27,7 +22,8 @@ add_hook('template.asset', function(string $file): string {
         return $file;
     }
     $file = trim($file, '/');
-    return do_hook('app.host') . "resource/{$file}";
+    $slug = trim(Url::ResourceSlug(), '/');
+    return do_hook('app.host') . "{$slug}/{$file}";
 });
 
 // Set Template Default JS Vars

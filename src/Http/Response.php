@@ -35,7 +35,7 @@ class Response
             "Access-Control-Allow-Methods"      =>  "GET, POST",
             "Access-Control-Allow-Headers"      =>  "Authorization, Origin, X-Requested-With, Content-Type, Accept, X-Laika-Token",
             "Access-Control-Allow-Credentials"  =>  "true",
-            "X-Powered-By"                      =>  "Laika",
+            "X-Powered-By"                      =>  "Laika Framework",
             "X-Frame-Options"                   =>  "sameorigin",
             "Content-Security-Policy"           =>  "frame-ancestors 'self'",
             "Referrer-Policy"                   =>  "origin-when-cross-origin",

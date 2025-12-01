@@ -66,15 +66,14 @@ class Url
 
     public function __construct()
     {
-        $this->scheme       =   isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' ? 'https' : 'http';
-        $this->host         =   $_SERVER['HTTP_HOST'] ?? 'localhost';
-        $this->path         =   parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?? '/';
-        $this->queryString  =   $_SERVER['QUERY_STRING'] ?? '';
-
-        $this->scriptName   =   $_SERVER['SCRIPT_NAME'] ?? ($_SERVER['PHP_SELF'] ?? '/index.php');
-        $this->directory    =   rtrim(str_replace('\\', '/', dirname($this->scriptName)), '/');
-
-        $this->baseUrl      =   $this->scheme . '://' . $this->host . $this->directory . '/';
+        $this->scheme = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' ? 'https' : 'http';
+        $host = $_SERVER['HTTP_HOST'] ?? $_SERVER['SERVER_NAME'] ?? 'localhost';
+        $this->host = strtolower(explode(':', $host)[0]);
+        $this->path = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?? '/';
+        $this->queryString = $_SERVER['QUERY_STRING'] ?? '';
+        $this->scriptName = $_SERVER['SCRIPT_NAME'] ?? ($_SERVER['PHP_SELF'] ?? '/index.php');
+        $this->directory = rtrim(str_replace('\\', '/', dirname($this->scriptName)), '/');
+        $this->baseUrl = $this->scheme . '://' . $this->host . $this->directory . '/';
     }
 
     ##############################################################################
@@ -246,8 +245,7 @@ class Url
      */
     public function host(): string
     {
-        $host = parse_url($_SERVER['HTTP_HOST'] ?? $_SERVER['SERVER_NAME'] ?? '', PHP_URL_HOST);
-        return $host ?: 'localhost';
+        return $this->host;
     }
 
     /**
@@ -256,6 +254,6 @@ class Url
      */
     public function isHttps(): bool
     {
-        return ($_SERVER['HTTPS'] ?? 'off') != 'off';
+        return $this->scheme === 'https';
     }
 }

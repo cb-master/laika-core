@@ -54,8 +54,9 @@ add_hook('app.icon', function(?string $option_key = null): string {
  */
 add_hook('app.local', function(string $property, ...$args): string {
     // Return if Class Doesn't Exists
-    if(!class_exists('LANG')) throw new RuntimeException("'LANG' Class Doesn't Exists!");
+    if(!class_exists('LANG')) {
+        throw new RuntimeException("'LANG' Class Doesn't Exists!");
+    }
     // Return if Class Exists
-    $value = LANG::$$property ?? 'Local Property Does Not Exists!';
-    return $value ? sprintf($value, ...$args) : '';
+    return sprintf(LANG::$$property ?? 'Local Property Does Not Exists!', ...$args);
 });
