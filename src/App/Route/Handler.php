@@ -113,7 +113,7 @@ class Handler
         self::$routes[self::$lastMethod][self::$lastUri]['afterwares'] = [
             'global'    =>  self::$globalAfterwares,
             'group'     =>  self::$groupAfterwares,
-            'route'     =>  self::$afterwares
+            'route'     =>  (array) self::$afterwares
         ];
         // Reset Afterwares
         self::$afterwares = [];
