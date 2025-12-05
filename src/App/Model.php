@@ -1,11 +1,11 @@
 <?php
 
 /**
- * Laika PHP MVC Framework
+ * Laika Framework
  * Author: Showket Ahmed
  * Email: riyadhtayf@gmail.com
  * License: MIT
- * This file is part of the Laika PHP MVC Framework.
+ * This file is part of the Laika Framework.
  * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
  */
 
@@ -13,7 +13,7 @@ namespace Laika\Core\App;
 
 use Laika\Model\Model as BaseModel;
 
-class Model extends BaseModel
+abstract class Model extends BaseModel
 {
     // Status Table Name
     public string $status_table;

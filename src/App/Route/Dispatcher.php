@@ -152,6 +152,9 @@ class Dispatcher
      */
     private static function CreateSecretKey(): void
     {
+        /**
+         * Create Secret Config File if Not Exist
+         */
         if(!Config::has('secret')) {
             Config::create('secret', ['key'=>bin2hex(random_bytes(64))]);
         }

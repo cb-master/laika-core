@@ -1,11 +1,11 @@
 <?php
 
 /**
- * Laika PHP MVC Framework
+ * Laika Framework
  * Author: Showket Ahmed
  * Email: riyadhtayf@gmail.com
  * License: MIT
- * This file is part of the Laika PHP MVC Framework.
+ * This file is part of the Laika Framework.
  * For the full copyright and license information, please view the LICENSE file that was distributed with this source code.
  */
 
@@ -16,7 +16,9 @@ namespace Laika\App\Model{{NAMESPACE}};
 // Deny Direct Access
 defined('APP_PATH') || http_response_code(403).die('403 Direct Access Denied!');
 
+use Laika\Model\Blueprint;
 use Laika\Core\App\Model;
+use Laika\Model\Schema;
 
 class {{NAME}} extends Model
 {
@@ -25,4 +27,27 @@ class {{NAME}} extends Model
 
     // Primary Key Column Name
     public string $id = '{{PRIMARY_KEY}}';
+
+    // UUID Column Name
+    public string $uuid = 'uuid';
+
+    /**
+     * Make Table if Doesnot Exists
+     * @return void
+     */
+    protected function migrate()
+    {
+        // Make Table
+        Schema::create($this->table, function (Blueprint $e) {
+            $e->id($this->id)
+                ->string($this->uuid, 50)
+                ->text('table_data', true)
+                ->enum('is_default', ['yes', 'no'], 'no')
+                ->index($this->uuid, 50);
+                ->index('is_default', 2);
+        });
+
+        // Return
+        return;
+    }
 }
