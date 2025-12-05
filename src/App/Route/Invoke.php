@@ -35,7 +35,8 @@ class Invoke
                     // Separate Parameters From Middleware
                     $parts = explode('|', $middleware);
                     $parts[0] = trim($parts[0], '\\');
-                    $middleware = "Laika\\App\\Middleware\\$parts[0]";
+                    // Get Class
+                    $middleware = class_exists($parts[0]) ? $parts[0] : "Laika\\App\\Middleware\\$parts[0]";
                     if (isset($parts[1])) {
                         $args = [];
                         $paramParts = explode(',', $parts[1]);
@@ -85,7 +86,7 @@ class Invoke
                     // Separate Parameters From Afterware
                     $parts = explode('|', $afterware);
                     $parts[0] = trim($parts[0], '\\');
-                    $afterware = "Laika\\App\\Middleware\\$parts[0]";
+                    $afterware = class_exists($parts[0]) ? $parts[0] : "Laika\\App\\Middleware\\$parts[0]";
                     if (isset($parts[1])) {
                         $args = [];
                         $paramParts = explode(',', $parts[1]);

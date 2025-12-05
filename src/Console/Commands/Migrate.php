@@ -13,9 +13,10 @@ declare(strict_types=1);
 
 namespace Laika\Core\Console\Commands;
 
-use Laika\Model\ConnectionManager;
 use Laika\Core\Console\Command;
 use Laika\Core\Helper\Config;
+use Laika\App\Model\Options;
+use Laika\Model\Blueprint;
 use Laika\Model\Schema;
 use Laika\Model\DB;
 use Exception;
@@ -33,11 +34,11 @@ class Migrate extends Command
             'time.zone'     =>  'Europe/London',
             'time.format'   =>  'Y-M-d H:i:s',
             'dbsession'     =>  'yes',
-            'developermode' =>  'yes',
+            'debug'         =>  'yes',
             'app.path'      =>  realpath(APP_PATH ?? __DIR__ . '/../../../../../../'),
             'admin.icon'    =>  'favicon.ico',
             'admin.logo'    =>  'logo.png',
-            'csrf.lifetime' =>  'logo.png',
+            'csrf.lifetime' =>  '300',
         ];
     }
 
@@ -48,38 +49,25 @@ class Migrate extends Command
      */
     public function run(array $params): void
     {
-        $connection_name = (isset($params[0]) && $params[0]) ? trim($params[0]) : 'default';
         try {
-            // Make PDO Connection
-            ConnectionManager::add(Config::get('database', $connection_name), $connection_name);
-
-            // Connectin=on Set for Schema
-            Schema::setConnection($connection_name);
-
             // Make Table
-            Schema::create('options', function ($e) {
-                $e->id('id')
-                    ->string('opt_key', 255)
-                    ->text('opt_value', true)
-                    ->enum('opt_default', ['yes', 'no'], 'no')
-                    ->index('opt_key', 255);
-            });
+            $model = new Options();
+            $model->migrate();
 
             // Insert Default Data
             $db = DB::getInstance();
 
-            // Get Old Data if Exist
-            $old_data = $db->table('options')->select('opt_key')->get();
-            if (!empty($old_data)) {
-                throw new Exception("Database Table 'options' Already Exists. Please Remove Old Table First");
+            // Check Option Table Doesn't Exists
+            if (!empty($model->all())) {
+                throw new Exception("Database Table '{$model->table}' Already Exists. Please Remove Old Table First");
             }
 
             $rows = [];
             foreach ($this->defaulKeys() as $key => $val) {
-                $rows[] = ['opt_key' => $key, 'opt_value' => $val, 'opt_default' => 'yes'];
+                $rows[] = [$model->name => $key, $model->value => $val, $model->default => 'yes'];
             }
             // Insert Options
-            $db->table('options')->insertMany($rows);
+            $model->insertMany($rows);
 
             // Create Secret Config File if Not Exist
             if (!Config::has('secret')) {

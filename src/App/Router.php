@@ -94,10 +94,10 @@ class Router
      * @param string|array $afterwares Register Router Url Afterware(s). Example: ['Sample/Namespace/Afterware'] or 'Sample/Namespace/Afterware'. Example Using Parameters: ['Sample/Namespace/Afterware|type=admin'] or 'Sample/Namespace/Afterware|type=admin'
      * @return self
      */
-    public static function group(string $prefix, callable $handler, string|array $middlewares = [], string|array $afterwares = [])
+    public static function group(string $prefix, callable $handler, string|array $middlewares = [], string|array $afterwares = []): void
     {
         Route\Handler::registerGroup($prefix, $handler, $middlewares, $afterwares);
-        return new self();
+        return;
     }
 
     /**

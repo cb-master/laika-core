@@ -13,19 +13,10 @@ declare(strict_types=1);
 
 namespace Laika\Core\Helper;
 
-use Laika\Model\DB;
+use Laika\App\Model\Options;
 
 class Option
 {
-    // Table Name
-    private static string $table = 'options';
-
-    // Option Key Column
-    private static string $key = 'opt_key';
-
-    // Option Value Column
-    private static string $value = 'opt_value';
-
     /**
      * Get Option Value
      * @param string $name - Required Argument as Option Key.
@@ -35,12 +26,10 @@ class Option
     public static function get(string $name, mixed $default = null): mixed
     {
         try {
-            $db = DB::getInstance();
-            $option = $db->table(self::$table)->where(self::$key, '=', $name)->first(self::$value);
-            $default = $option[self::$value] ?? $default;
-        } catch (\Throwable $th) {
-            //
-        }
+            $model = new Options();
+            $option = $model->first([$model->name => $name]);
+            $default = $option[$model->value] ?? $default;
+        } catch (\Throwable $th) {}
         return $default;
     }
 
@@ -52,15 +41,19 @@ class Option
      */
     public static function set(string $name, string $value, bool $default = false): bool
     {
-        $db = DB::getInstance();
-        $opt_default = $default ? 'yes' : 'no';
+        $model = new Options();
+        $default_option = $default ? 'yes' : 'no';
 
-        $exist = $db->table(self::$table)->where(self::$key, '=', $name)->first();
-
-        if (empty($exist)) {
-            return (bool) $db->table(self::$table)->insert([self::$key => $name, self::$value => $value, 'opt_default' => $opt_default]);
+        // Check Option Name Doesn't Exists
+        if (empty($model->first([$model->name => $name]))) {
+            return (bool) $model->insert([
+                $model->name => $name,
+                $model->value => $value,
+                $model->default => $default_option
+            ]);
         }
 
-        return (bool) $db->table(self::$table)->where(self::$key, '=', $name)->update([self::$value => $value]);
+        // Update Value
+        return (bool) $model->update([$model->name => $name], [$model->value => $value]);
     }
 }
